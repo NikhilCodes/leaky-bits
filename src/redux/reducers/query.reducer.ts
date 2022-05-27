@@ -3,7 +3,7 @@ import { TabledataSource } from '../../component/InteractiveTable';
 
 const initialState = {
   loading: false,
-  dataSource: { data: [] } as TabledataSource,
+  dataSource: { data: [], total: 0 } as TabledataSource,
   error: null,
 };
 

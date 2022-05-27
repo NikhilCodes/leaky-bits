@@ -48,6 +48,9 @@ export function InteractiveTable(props: InteractiveTableProps) {
   const getPaginationRangeFromPageAndPageSize = () => {
     const start = page * pageSize;
     const end = start + pageSize;
+    if (props.dataSource.total === 0) {
+      return '0-0';
+    }
     return `${start + 1}-${Math.min(end, props.dataSource.total)}`;
   };
 
