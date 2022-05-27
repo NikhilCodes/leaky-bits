@@ -3,7 +3,8 @@ import { TabledataSource } from '../../component/InteractiveTable';
 
 const initialState = {
   loading: false,
-  dataSource: { data: [], total: 0 } as TabledataSource,
+  lastQuery: null,
+  dataSource: { data: [], primaryKey: '', total: 0 } as TabledataSource,
   error: null,
 };
 
@@ -17,6 +18,7 @@ const queryReducer = (state = initialState, action) => {
         loading: false,
         dataSource: action.dataSource,
         error: null,
+        lastQuery: action.lastQuery
       };
     case QueryStatus.ERROR:
       return {

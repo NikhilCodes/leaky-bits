@@ -8,7 +8,7 @@ export function* executeQuery(action) {
   try {
     yield put({ type: QueryStatus.PENDING });
     const dataSource = yield call(getResponseForQuery, { query, page, pageSize });
-    yield put({ type: QueryStatus.SUCCESS, dataSource });
+    yield put({ type: QueryStatus.SUCCESS, dataSource, lastQuery: query });
   } catch (error) {
     yield put({ type: QueryStatus.ERROR, error });
   }
