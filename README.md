@@ -20,10 +20,11 @@ do operation on top of existing results.
 
 ## Toolchain
 
-|              For               |                   I used                   |
-|:------------------------------:|:------------------------------------------:|
-|       Frontend Framework       |       [React](https://reactjs.org/)        |
-|           UI Library           |      [AntDesign](https://ant.design)       |
+|        For         |          I used                         |
+|:------------------:|:---------------------------------------:|
+| Frontend Framework |      [React](https://reactjs.org/)      |
+|     UI Library     |     [AntDesign](https://ant.design)     |
+|  State Management  | [Redux Saga](https://redux-saga.js.org) |
 
 ## Page Load Metrics
 
