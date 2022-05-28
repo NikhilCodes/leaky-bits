@@ -22,6 +22,7 @@ export function DataViewer() {
       dataSource={query.dataSource}
       onPaginate={onTablePaginate}
       exportDataGetter={getUnPaginatedQueryData}
+      loading={query.loading}
     />
   );
 }
