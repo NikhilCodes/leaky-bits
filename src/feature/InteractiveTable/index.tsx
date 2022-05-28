@@ -132,7 +132,7 @@ interface TableControlsProps {
   exportDataGetter: () => Promise<any>;
 }
 
-const TableControls = React.memo((props: TableControlsProps) => {
+const TableControls = ((props: TableControlsProps) => {
   const {
     onNextPage,
     onPrevPage,

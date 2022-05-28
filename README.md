@@ -37,3 +37,6 @@ do operation on top of existing results.
 - Added resolutions to package.json that helped with performance increase of AntD Table, preventing unnecessary rerender
   when
   hovering.[67e8a6565e2a4b6aabbb13960653f2709e0a11b5](https://github.com/NikhilCodes/leaky-bits/commit/67e8a6565e2a4b6aabbb13960653f2709e0a11b5)
+- Used `React.memo` on Table Control component to prevent unnecessary re-renders.
+  - Before: ![Image](https://i.ibb.co/nwFb3sC/Screenshot-2022-05-29-at-12-15-26-AM.png)
+  - After: ![Image](https://i.ibb.co/2FqcP3D/Screenshot-2022-05-29-at-12-11-21-AM.png)
