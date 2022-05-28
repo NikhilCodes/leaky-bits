@@ -33,6 +33,7 @@ export interface InteractiveTableProps {
   dataSource: TabledataSource;
   loading?: boolean;
   onPaginate: (props: OnPaginateProps) => void;
+  exportDataGetter: () => Promise<any>;
 }
 
 export interface OnPaginateProps {
@@ -48,7 +49,7 @@ export function InteractiveTable(props: InteractiveTableProps) {
   // Configs
   const paginationConfig = {
     defaultPageSize: 10,
-    options: [5, 10, 50, 100, 500, 1000],
+    options: [5, 10, 50, 100, 500, 1000, -1],
   };
 
   const paginationMenu = <Menu
@@ -57,13 +58,19 @@ export function InteractiveTable(props: InteractiveTableProps) {
       setPage(0);
     }}
     items={[
-      ...paginationConfig.options.map((size) => ({ key: size, label: size })),
+      ...paginationConfig.options.map((size) => {
+        if (size === -1) {
+          return { key: Number.MAX_SAFE_INTEGER, label: 'All' };
+        }
+        return { key: size, label: size }
+      }),
     ]}
   />
   //
 
   const [page, setPage] = React.useState(0);
   const [pageSize, setPageSize] = React.useState(paginationConfig.defaultPageSize);
+  const [loadingExportData, setLoadingExportData] = React.useState(false);
 
   useEffect(() => {
     // TODO: Try debounce for throtting
@@ -97,8 +104,6 @@ export function InteractiveTable(props: InteractiveTableProps) {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet");
-    //let buffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
-    //XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
     XLSX.writeFile(workbook, "export.xlsx");
   };
 
@@ -119,16 +124,22 @@ export function InteractiveTable(props: InteractiveTableProps) {
     document.body.removeChild(link);
   }
 
-  const onExport = (exportType) => {
-    switch (exportType.key) {
-      case 'xlsx':
-        exportJsonToExcel(props.dataSource.data);
-        break;
-      case 'csv':
-        exportJsonToCsv(props.dataSource.data, props.dataSource.columnNames);
-        break;
-      default:
-        break;
+  const onExport = async (exportType) => {
+    try {
+      setLoadingExportData(true);
+      const { data } = await props.exportDataGetter();
+      switch (exportType.key) {
+        case 'xlsx':
+          exportJsonToExcel(data);
+          break;
+        case 'csv':
+          exportJsonToCsv(data, props.dataSource.columnNames);
+          break;
+        default:
+          break;
+      }
+    } finally {
+      setLoadingExportData(false);
     }
   }
 
@@ -170,12 +181,12 @@ export function InteractiveTable(props: InteractiveTableProps) {
               onClick={() => setPage(Math.ceil(props.dataSource.total / pageSize) - 1)}><VerticalLeftOutlined/></Button>
 
       <div className={'buttons-container'}>
-      {/* Dropdown button to choose excel or csv */}
+        {/* Dropdown button to choose excel or csv */}
         <Dropdown overlay={exportButtonMenu} trigger={['click']}>
-          <Button>
+          <Button loading={loadingExportData}>
             <Space>
               Export as
-              <DownOutlined />
+              <DownOutlined/>
             </Space>
           </Button>
         </Dropdown>
@@ -189,6 +200,7 @@ export function InteractiveTable(props: InteractiveTableProps) {
       scroll={{ x: 200 * getColumns().length }}
       columns={getColumns()}
       dataSource={props.dataSource.data}
+      showSorterTooltip={false}
       sortDirections={['ascend', 'descend']}
       onChange={(_, filters, sorter, __) => {
         props.onPaginate({ page, pageSize, sorter: { columnKey: sorter['columnKey'], order: sorter['order'] } })

@@ -10,12 +10,19 @@ import { InteractiveTable, OnPaginateProps } from './component/InteractiveTable'
 import { useSelector } from 'react-redux';
 import { action } from './redux';
 import { QueryActions } from './redux/types';
+import { getResponseForQuery } from './api/public/query.api';
 
 function App() {
   const query = useSelector((state: any) => state.queryReducer);
   const onTablePaginate = (props: OnPaginateProps) => {
-    action(QueryActions.EXECUTE_QUERY, { query: query.lastQuery, ...props });
+    if (query.lastQuery) {
+      action(QueryActions.EXECUTE_QUERY, { query: query.lastQuery, ...props });
+    }
   };
+
+  const getUnpaginatedQueryData = async () => {
+    return getResponseForQuery({ query: query.lastQuery });
+  }
 
   return (
     <div className="App">
@@ -27,7 +34,12 @@ function App() {
         <ReflexSplitter propagate={true}/>
 
         <ReflexElement minSize={50} resizeHeight={true}>
-          <InteractiveTable dataSource={query.dataSource} loading={query.loading} onPaginate={onTablePaginate}/>
+          <InteractiveTable
+            dataSource={query.dataSource}
+            loading={query.loading}
+            onPaginate={onTablePaginate}
+            exportDataGetter={getUnpaginatedQueryData}
+          />
         </ReflexElement>
       </ReflexContainer>
     </div>

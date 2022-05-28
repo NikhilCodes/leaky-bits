@@ -1,7 +1,11 @@
 import { get } from './utils';
 import { TabledataSource } from '../../component/InteractiveTable';
 
-export const getResponseForQuery = async (params: { query: string, page: number, pageSize: number, sorter? }): Promise<TabledataSource> => {
+export const getResponseForQuery = async (params: { query: string, page?: number, pageSize?: number, sorter? }): Promise<TabledataSource> => {
+  // NOTE: This is a mock implementation. In a real application, you would use the API to get the data.
+  // The delay is to simulate the time it takes to get the data from the server.
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
   const filename = params.query.split(' ').pop().toLowerCase();
   const csvFileUrl = `https://raw.githubusercontent.com/graphql-compose/graphql-compose-examples/master/examples/northwind/data/csv/${filename}.csv`;
   const { data: csvData } = await get(csvFileUrl);
@@ -17,6 +21,7 @@ export const getResponseForQuery = async (params: { query: string, page: number,
     return rowAsJson;
   });
 
+  // Sorting data
   if (params.sorter && params.sorter.order) {
     const { columnKey, order } = params.sorter;
     data = data.sort((a, b) => {
@@ -26,10 +31,17 @@ export const getResponseForQuery = async (params: { query: string, page: number,
       return a[columnKey] < b[columnKey] ? 1 : -1;
     });
   }
+
+  const total = data.length;
+  // Pagination
+  if (params.page != null && params.pageSize != null) {
+    data = data.slice(params.page * params.pageSize, (params.page + 1) * params.pageSize)
+  }
+
   return {
-    total: data.length,
+    total,
     columnNames: csvHeaders,
-    data: data.slice(params.page * params.pageSize, (params.page + 1) * params.pageSize),
+    data,
     primaryKey: `${filename.slice(0, filename.length - 1)}ID`
   };
 }
