@@ -12,7 +12,7 @@ const configureStore = (rootReducer, rootSaga) => {
   middlewares.push(sagaMiddleware); // Saga Middleware
 
   if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
-    middlewares.push(createLogger()); // Redux Logger Middleware
+    // middlewares.push(createLogger()); // Redux Logger Middleware
   }
 
   // Assemble middlewares

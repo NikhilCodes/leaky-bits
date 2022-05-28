@@ -1,5 +1,5 @@
 import './style.css';
-import { Button, Dropdown, Menu, Table } from 'antd';
+import { Button, Dropdown, Menu, Space, Table } from 'antd';
 import columnGen from '../../helper/column-gen';
 import {
   RightOutlined,
@@ -9,7 +9,7 @@ import {
   DownOutlined
 } from '@ant-design/icons';
 import React, { useCallback, useEffect } from 'react';
-import { action } from '../../redux';
+import * as XLSX from 'xlsx';
 
 export interface dataSourceData {
   [key: string]: any;
@@ -24,7 +24,7 @@ export class TabledataSource {
   constructor() {
     this.data = [];
     this.primaryKey = null;
-    this.total = null;
+    this.total = 0;
     this.columnNames = [];
   }
 }
@@ -70,6 +70,10 @@ export function InteractiveTable(props: InteractiveTableProps) {
     props.onPaginate({ page, pageSize });
   }, [page, pageSize]);
 
+  useEffect(() => {
+    setPage(0);
+  }, [props.dataSource.total]);
+
   const getPaginationRangeFromPageAndPageSize = () => {
     const start = page * pageSize;
     const end = start + pageSize;
@@ -88,6 +92,59 @@ export function InteractiveTable(props: InteractiveTableProps) {
       setPage((p) => p + 1);
     }
   }
+
+  const exportJsonToExcel = (data) => {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet");
+    //let buffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
+    //XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
+    XLSX.writeFile(workbook, "export.xlsx");
+  };
+
+  const exportJsonToCsv = (data, columnNames) => {
+    let csv = columnNames.join(',') + '\n';
+    csv += data.map((row) => {
+      return Object.keys(row).map((key) => {
+        return row[key];
+      }).join(',');
+    }).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'export.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  const onExport = (exportType) => {
+    switch (exportType.key) {
+      case 'xlsx':
+        exportJsonToExcel(props.dataSource.data);
+        break;
+      case 'csv':
+        exportJsonToCsv(props.dataSource.data, props.dataSource.columnNames);
+        break;
+      default:
+        break;
+    }
+  }
+
+  const exportButtonMenu = <Menu
+    onClick={onExport}
+    items={[
+      {
+        key: 'csv',
+        label: 'CSV',
+      },
+      {
+        key: 'xlsx',
+        label: 'XLSX',
+      },
+    ]}
+  />
 
   const getColumns = useCallback(() => {
     return columnGen(props.dataSource.columnNames);
@@ -110,7 +167,19 @@ export function InteractiveTable(props: InteractiveTableProps) {
       &nbsp;&nbsp;of {props.dataSource.total} &nbsp;&nbsp;
       <Button type={'text'} className={'p-0'} onClick={onNextPage}><RightOutlined/></Button>
       <Button type={'text'}
-              onClick={() => setPage(((props.dataSource.total / pageSize) - 1))}><VerticalLeftOutlined/></Button>
+              onClick={() => setPage(Math.ceil(props.dataSource.total / pageSize) - 1)}><VerticalLeftOutlined/></Button>
+
+      <div className={'buttons-container'}>
+      {/* Dropdown button to choose excel or csv */}
+        <Dropdown overlay={exportButtonMenu} trigger={['click']}>
+          <Button>
+            <Space>
+              Export as
+              <DownOutlined />
+            </Space>
+          </Button>
+        </Dropdown>
+      </div>
     </div>
 
     {/* Table */}
@@ -122,16 +191,9 @@ export function InteractiveTable(props: InteractiveTableProps) {
       dataSource={props.dataSource.data}
       sortDirections={['ascend', 'descend']}
       onChange={(_, filters, sorter, __) => {
-        console.log(filters, sorter);
         props.onPaginate({ page, pageSize, sorter: { columnKey: sorter['columnKey'], order: sorter['order'] } })
       }}
       rowKey={(record) => record[props.dataSource.primaryKey]}
-    >
-      {getColumns().map((colName) => (<Table.Column
-        title={colName.title}
-        dataIndex={colName.dataIndex}
-        key={colName.key}
-      />))}
-    </Table>
+    />
   </div>;
 }
