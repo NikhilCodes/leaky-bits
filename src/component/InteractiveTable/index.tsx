@@ -72,33 +72,34 @@ export function InteractiveTable(props: InteractiveTableProps) {
   const [pageSize, setPageSize] = React.useState(paginationConfig.defaultPageSize);
   const [loadingExportData, setLoadingExportData] = React.useState(false);
   const { onPaginate, dataSource, exportDataGetter, loading } = props;
+
   useEffect(() => {
     // TODO: Try debounce for throtting
     onPaginate({ page, pageSize });
-  }, [page, pageSize]);
+  }, [page, pageSize, onPaginate]);
 
   useEffect(() => {
     setPage(0);
   }, [props.dataSource.total]);
 
-  const getPaginationRangeFromPageAndPageSize = () => {
+  const PaginationRangeText = React.memo(() => {
     const start = page * pageSize;
     const end = start + pageSize;
     if (dataSource.total === 0) {
-      return '0-0';
+      return <span>0-0</span>;
     }
-    return `${start + 1}-${Math.min(end, dataSource.total)}`;
-  };
+    return <span>{`${start + 1}-${Math.min(end, dataSource.total)}`}</span>;
+  });
 
-  const onPrevPage = () => {
+  const onPrevPage = useCallback(() => {
     setPage((p) => p ? p - 1 : p);
-  };
+  }, []);
 
-  const onNextPage = () => {
+  const onNextPage = useCallback(() => {
     if (dataSource.total > pageSize * (page + 1)) {
       setPage((p) => p + 1);
     }
-  }
+  }, [page, pageSize, dataSource.total]);
 
   const exportJsonToExcel = (data) => {
     const worksheet = XLSX.utils.json_to_sheet(data);
@@ -169,7 +170,7 @@ export function InteractiveTable(props: InteractiveTableProps) {
       <div style={{ paddingLeft: 10 }}>
         <Dropdown overlay={paginationMenu} trigger={['click']}>
           <Button style={{ minWidth: 100 }}>
-            <span>{getPaginationRangeFromPageAndPageSize()}</span>
+            <PaginationRangeText/>
             <DownOutlined/>
           </Button>
         </Dropdown>

@@ -14,13 +14,13 @@ import { getResponseForQuery } from './api/public/query.api';
 
 function App() {
   const query = useSelector((state: any) => state.queryReducer);
-  const onTablePaginate = (props: OnPaginateParams) => {
+  const onTablePaginate = useCallback((params: OnPaginateParams) => {
     if (query.lastQuery) {
-      action(QueryActions.EXECUTE_QUERY, { query: query.lastQuery, ...props });
+      action(QueryActions.EXECUTE_QUERY, { query: query.lastQuery, ...params });
     }
-  };
+  }, [query.lastQuery]);
 
-  const getUnpaginatedQueryData = async () => {
+  const getUnPaginatedQueryData = async () => {
     return getResponseForQuery({ query: query.lastQuery });
   }
 
@@ -38,7 +38,7 @@ function App() {
             dataSource={query.dataSource}
             loading={query.loading}
             onPaginate={onTablePaginate}
-            exportDataGetter={getUnpaginatedQueryData}
+            exportDataGetter={getUnPaginatedQueryData}
           />
         </ReflexElement>
       </ReflexContainer>
