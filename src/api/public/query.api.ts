@@ -25,10 +25,16 @@ export const getResponseForQuery = async (params: { query: string, page?: number
   if (params.sorter && params.sorter.order) {
     const { columnKey, order } = params.sorter;
     data = data.sort((a, b) => {
-      if (order === 'ascend') {
-        return a[columnKey] > b[columnKey] ? 1 : -1;
+      let v1 = a[columnKey];
+      let v2 = b[columnKey];
+      if (!isNaN(v1 - v2)) {
+        v1 = +v1;
+        v2 = +v2;
       }
-      return a[columnKey] < b[columnKey] ? 1 : -1;
+      if (order === 'ascend') {
+        return v1 > v2 ? 1 : -1;
+      }
+      return v1 < v2 ? 1 : -1;
     });
   }
 

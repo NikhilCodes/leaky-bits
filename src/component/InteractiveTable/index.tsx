@@ -32,11 +32,11 @@ export class TabledataSource {
 export interface InteractiveTableProps {
   dataSource: TabledataSource;
   loading?: boolean;
-  onPaginate: (props: OnPaginateProps) => void;
+  onPaginate: (props: OnPaginateParams) => void;
   exportDataGetter: () => Promise<any>;
 }
 
-export interface OnPaginateProps {
+export interface OnPaginateParams {
   page: number;
   pageSize: number;
   sorter?: {
@@ -62,7 +62,7 @@ export function InteractiveTable(props: InteractiveTableProps) {
         if (size === -1) {
           return { key: Number.MAX_SAFE_INTEGER, label: 'All' };
         }
-        return { key: size, label: size }
+        return { key: size, label: size };
       }),
     ]}
   />
@@ -71,10 +71,10 @@ export function InteractiveTable(props: InteractiveTableProps) {
   const [page, setPage] = React.useState(0);
   const [pageSize, setPageSize] = React.useState(paginationConfig.defaultPageSize);
   const [loadingExportData, setLoadingExportData] = React.useState(false);
-
+  const { onPaginate, dataSource, exportDataGetter, loading } = props;
   useEffect(() => {
     // TODO: Try debounce for throtting
-    props.onPaginate({ page, pageSize });
+    onPaginate({ page, pageSize });
   }, [page, pageSize]);
 
   useEffect(() => {
@@ -84,10 +84,10 @@ export function InteractiveTable(props: InteractiveTableProps) {
   const getPaginationRangeFromPageAndPageSize = () => {
     const start = page * pageSize;
     const end = start + pageSize;
-    if (props.dataSource.total === 0) {
+    if (dataSource.total === 0) {
       return '0-0';
     }
-    return `${start + 1}-${Math.min(end, props.dataSource.total)}`;
+    return `${start + 1}-${Math.min(end, dataSource.total)}`;
   };
 
   const onPrevPage = () => {
@@ -95,7 +95,7 @@ export function InteractiveTable(props: InteractiveTableProps) {
   };
 
   const onNextPage = () => {
-    if (props.dataSource.total > pageSize * (page + 1)) {
+    if (dataSource.total > pageSize * (page + 1)) {
       setPage((p) => p + 1);
     }
   }
@@ -127,13 +127,13 @@ export function InteractiveTable(props: InteractiveTableProps) {
   const onExport = async (exportType) => {
     try {
       setLoadingExportData(true);
-      const { data } = await props.exportDataGetter();
+      const { data } = await exportDataGetter();
       switch (exportType.key) {
         case 'xlsx':
           exportJsonToExcel(data);
           break;
         case 'csv':
-          exportJsonToCsv(data, props.dataSource.columnNames);
+          exportJsonToCsv(data, dataSource.columnNames);
           break;
         default:
           break;
@@ -158,8 +158,8 @@ export function InteractiveTable(props: InteractiveTableProps) {
   />
 
   const getColumns = useCallback(() => {
-    return columnGen(props.dataSource.columnNames);
-  }, [props.dataSource.columnNames]);
+    return columnGen(dataSource.columnNames);
+  }, [dataSource.columnNames]);
 
   return <div className={'interactive-table'}>
     {/* Table Controls */}
@@ -175,10 +175,10 @@ export function InteractiveTable(props: InteractiveTableProps) {
         </Dropdown>
       </div>
 
-      &nbsp;&nbsp;of {props.dataSource.total} &nbsp;&nbsp;
+      &nbsp;&nbsp;of {dataSource.total} &nbsp;&nbsp;
       <Button type={'text'} className={'p-0'} onClick={onNextPage}><RightOutlined/></Button>
       <Button type={'text'}
-              onClick={() => setPage(Math.ceil(props.dataSource.total / pageSize) - 1)}><VerticalLeftOutlined/></Button>
+              onClick={() => setPage(Math.ceil(dataSource.total / pageSize) - 1)}><VerticalLeftOutlined/></Button>
 
       <div className={'buttons-container'}>
         {/* Dropdown button to choose excel or csv */}
@@ -196,16 +196,16 @@ export function InteractiveTable(props: InteractiveTableProps) {
     {/* Table */}
     <Table
       pagination={false}
-      loading={props.loading}
+      loading={loading}
       scroll={{ x: 200 * getColumns().length }}
       columns={getColumns()}
-      dataSource={props.dataSource.data}
+      dataSource={dataSource.data}
       showSorterTooltip={false}
       sortDirections={['ascend', 'descend']}
       onChange={(_, filters, sorter, __) => {
-        props.onPaginate({ page, pageSize, sorter: { columnKey: sorter['columnKey'], order: sorter['order'] } })
+        onPaginate({ page, pageSize, sorter: { columnKey: sorter['columnKey'], order: sorter['order'] } })
       }}
-      rowKey={(record) => record[props.dataSource.primaryKey]}
+      rowKey={(record) => record[dataSource.primaryKey]}
     />
   </div>;
 }

@@ -11,7 +11,7 @@ export default function tableColumnGen(columnNames) {
         return 0;
       },
       render: (value) => {
-        if (value == null || value == 'NULL') {
+        if (value == null || value === 'NULL') {
           return <span style={{color: 'gray'}}>NULL</span>
         }
         return <span

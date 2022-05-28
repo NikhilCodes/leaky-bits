@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import './App.css';
 import {
   ReflexContainer,
@@ -6,7 +6,7 @@ import {
   ReflexElement
 } from 'react-reflex';
 import Editor from './component/Editor';
-import { InteractiveTable, OnPaginateProps } from './component/InteractiveTable';
+import { InteractiveTable, OnPaginateParams } from './component/InteractiveTable';
 import { useSelector } from 'react-redux';
 import { action } from './redux';
 import { QueryActions } from './redux/types';
@@ -14,7 +14,7 @@ import { getResponseForQuery } from './api/public/query.api';
 
 function App() {
   const query = useSelector((state: any) => state.queryReducer);
-  const onTablePaginate = (props: OnPaginateProps) => {
+  const onTablePaginate = (props: OnPaginateParams) => {
     if (query.lastQuery) {
       action(QueryActions.EXECUTE_QUERY, { query: query.lastQuery, ...props });
     }
