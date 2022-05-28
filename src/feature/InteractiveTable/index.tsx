@@ -1,12 +1,11 @@
 import './style.css';
-import { Button, Dropdown, Menu, Space, Table } from 'antd';
-import columnGen from '../../helper/column-gen';
+import { Button, Drawer, Dropdown, Menu, Space, Table } from 'antd';
 import {
   RightOutlined,
   LeftOutlined,
   VerticalRightOutlined,
   VerticalLeftOutlined,
-  DownOutlined
+  DownOutlined, MoreOutlined
 } from '@ant-design/icons';
 import React, { useCallback, useEffect } from 'react';
 import * as XLSX from 'xlsx';
@@ -86,7 +85,7 @@ export function InteractiveTable(props: InteractiveTableProps) {
   }, [dataSource.total, pageSize]);
 
   const getColumns = useCallback(() => {
-    return columnGen(dataSource.columnNames);
+    return tableColumnGen(dataSource.columnNames);
   }, [dataSource.columnNames]);
 
   return <div className={'interactive-table'}>
@@ -116,9 +115,32 @@ export function InteractiveTable(props: InteractiveTableProps) {
         onPaginate({ page, pageSize, sorter: { columnKey: sorter['columnKey'], order: sorter['order'] } })
       }}
       rowKey={(record) => record[dataSource.primaryKey]}
+      sticky
     />
   </div>;
 }
+
+interface SummaryDrawerProp {
+  onClose: (e) => void;
+  visible: boolean;
+  columnKey: string;
+}
+
+const SummaryDrawer = React.memo((props: SummaryDrawerProp) => {
+  return (
+    <Drawer
+      title={`Summary of ${props.columnKey}`}
+      placement="right"
+      onClose={props.onClose}
+      visible={props.visible}
+      size={'large'}
+    >
+      <p>Some contents...</p>
+      <p>Some contents...</p>
+      <p>Some contents...</p>
+    </Drawer>
+  );
+});
 
 interface TableControlsProps {
   onNextPage: () => void;
@@ -259,3 +281,55 @@ const TableControls = React.memo((props: TableControlsProps) => {
     </div>
   );
 });
+
+function tableColumnGen(columnNames) {
+  return columnNames.map(header => {
+    return {
+      title: (<span>
+        <ShowMoreButton columnKey={header}/>
+        <span>{header}</span>
+      </span>),
+      dataIndex: header,
+      key: header,
+      sorter: (_, __) => {
+        // Disable sorting on client side.
+        // This can't be undefined for sorting buttons to show up.
+        return 0;
+      },
+      render: (value) => {
+        if (value == null || value === 'NULL') {
+          return <span style={{ color: 'gray' }}>NULL</span>
+        }
+        return <span
+          // TODO: Selection handlers
+        >{value}</span>
+      },
+    };
+  });
+}
+
+const ShowMoreButton = React.memo((props: { columnKey: string }) => {
+  const [summaryDrawerVisible, setSummaryDrawerVisible] = React.useState(false);
+
+  return (
+    <>
+      <Button
+        onClick={(e) => {
+          e.stopPropagation();
+          setSummaryDrawerVisible(true);
+        }}
+        type={'text'}
+        style={{ marginRight: 5 }}
+        icon={<MoreOutlined/>}
+      />
+      <SummaryDrawer
+        onClose={(e) => {
+          e.stopPropagation();
+          setSummaryDrawerVisible(false);
+        }}
+        visible={summaryDrawerVisible}
+        columnKey={props.columnKey}
+      />
+    </>
+  );
+})

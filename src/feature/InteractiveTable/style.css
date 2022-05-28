@@ -2,6 +2,10 @@
   height: 100%;
 }
 
+.interactive-table .ant-table-sticky-scroll {
+  display: none;
+}
+
 .controls {
   padding: 10px;
   display: flex;
