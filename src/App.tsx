@@ -19,12 +19,6 @@ function App() {
         <ReflexSplitter propagate={true}/>
 
         <ReflexElement minSize={50} resizeHeight={true}>
-          {/*<InteractiveTable*/}
-          {/*  dataSource={query.dataSource}*/}
-          {/*  loading={query.loading}*/}
-          {/*  onPaginate={onTablePaginate}*/}
-          {/*  exportDataGetter={getUnPaginatedQueryData}*/}
-          {/*/>*/}
           <DataViewer />
         </ReflexElement>
       </ReflexContainer>
