@@ -1,5 +1,5 @@
 import { get } from './utils';
-import { TabledataSource } from '../../component/InteractiveTable';
+import { TabledataSource } from '../../feature/InteractiveTable';
 
 export const getResponseForQuery = async (params: { query: string, page?: number, pageSize?: number, sorter? }): Promise<TabledataSource> => {
   // NOTE: This is a mock implementation. In a real application, you would use the API to get the data.

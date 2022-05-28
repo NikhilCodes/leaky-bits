@@ -6,24 +6,9 @@ import {
   ReflexElement
 } from 'react-reflex';
 import Editor from './component/Editor';
-import { InteractiveTable, OnPaginateParams } from './component/InteractiveTable';
-import { useSelector } from 'react-redux';
-import { action } from './redux';
-import { QueryActions } from './redux/types';
-import { getResponseForQuery } from './api/public/query.api';
+import { DataViewer } from './component/DataViewer';
 
 function App() {
-  const query = useSelector((state: any) => state.queryReducer);
-  const onTablePaginate = useCallback((params: OnPaginateParams) => {
-    if (query.lastQuery) {
-      action(QueryActions.EXECUTE_QUERY, { query: query.lastQuery, ...params });
-    }
-  }, [query.lastQuery]);
-
-  const getUnPaginatedQueryData = async () => {
-    return getResponseForQuery({ query: query.lastQuery });
-  }
-
   return (
     <div className="App">
       <ReflexContainer>
@@ -34,12 +19,13 @@ function App() {
         <ReflexSplitter propagate={true}/>
 
         <ReflexElement minSize={50} resizeHeight={true}>
-          <InteractiveTable
-            dataSource={query.dataSource}
-            loading={query.loading}
-            onPaginate={onTablePaginate}
-            exportDataGetter={getUnPaginatedQueryData}
-          />
+          {/*<InteractiveTable*/}
+          {/*  dataSource={query.dataSource}*/}
+          {/*  loading={query.loading}*/}
+          {/*  onPaginate={onTablePaginate}*/}
+          {/*  exportDataGetter={getUnPaginatedQueryData}*/}
+          {/*/>*/}
+          <DataViewer />
         </ReflexElement>
       </ReflexContainer>
     </div>

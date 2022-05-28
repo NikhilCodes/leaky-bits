@@ -45,32 +45,17 @@ export interface OnPaginateParams {
   };
 }
 
+// Configs
+const paginationConfig = {
+  defaultPageSize: 10,
+  options: [5, 10, 50, 100, 500, 1000, -1],
+};
+
+//
+
 export function InteractiveTable(props: InteractiveTableProps) {
-  // Configs
-  const paginationConfig = {
-    defaultPageSize: 10,
-    options: [5, 10, 50, 100, 500, 1000, -1],
-  };
-
-  const paginationMenu = <Menu
-    onClick={(e) => {
-      setPageSize(+e.key);
-      setPage(0);
-    }}
-    items={[
-      ...paginationConfig.options.map((size) => {
-        if (size === -1) {
-          return { key: Number.MAX_SAFE_INTEGER, label: 'All' };
-        }
-        return { key: size, label: size };
-      }),
-    ]}
-  />
-  //
-
   const [page, setPage] = React.useState(0);
   const [pageSize, setPageSize] = React.useState(paginationConfig.defaultPageSize);
-  const [loadingExportData, setLoadingExportData] = React.useState(false);
   const { onPaginate, dataSource, exportDataGetter, loading } = props;
 
   useEffect(() => {
@@ -82,15 +67,6 @@ export function InteractiveTable(props: InteractiveTableProps) {
     setPage(0);
   }, [props.dataSource.total]);
 
-  const PaginationRangeText = React.memo(() => {
-    const start = page * pageSize;
-    const end = start + pageSize;
-    if (dataSource.total === 0) {
-      return <span>0-0</span>;
-    }
-    return <span>{`${start + 1}-${Math.min(end, dataSource.total)}`}</span>;
-  });
-
   const onPrevPage = useCallback(() => {
     setPage((p) => p ? p - 1 : p);
   }, []);
@@ -100,6 +76,99 @@ export function InteractiveTable(props: InteractiveTableProps) {
       setPage((p) => p + 1);
     }
   }, [page, pageSize, dataSource.total]);
+
+  const onFirstPage = useCallback(() => {
+    setPage(0);
+  }, []);
+
+  const onLastPage = useCallback(() => {
+    setPage(Math.ceil(dataSource.total / pageSize) - 1)
+  }, [dataSource.total, pageSize]);
+
+  const getColumns = useCallback(() => {
+    return columnGen(dataSource.columnNames);
+  }, [dataSource.columnNames]);
+
+  return <div className={'interactive-table'}>
+    {/* Table Controls */}
+    <TableControls
+      exportDataGetter={exportDataGetter}
+      total={dataSource.total}
+      page={page}
+      pageSize={pageSize}
+      onNextPage={onNextPage}
+      onPrevPage={onPrevPage}
+      onFirstPage={onFirstPage}
+      onLastPage={onLastPage}
+      setPageSize={setPageSize}
+    />
+
+    {/* Table */}
+    <Table
+      pagination={false}
+      loading={loading}
+      scroll={{ x: 200 * getColumns().length }}
+      columns={getColumns()}
+      dataSource={dataSource.data}
+      showSorterTooltip={false}
+      sortDirections={['ascend', 'descend']}
+      onChange={(_, filters, sorter, __) => {
+        onPaginate({ page, pageSize, sorter: { columnKey: sorter['columnKey'], order: sorter['order'] } })
+      }}
+      rowKey={(record) => record[dataSource.primaryKey]}
+    />
+  </div>;
+}
+
+interface TableControlsProps {
+  onNextPage: () => void;
+  onPrevPage: () => void;
+  onFirstPage: () => void;
+  onLastPage: () => void;
+  total: number;
+  page: number;
+  pageSize: number;
+  setPageSize: (pageSize: number) => void;
+  exportDataGetter: () => Promise<any>;
+}
+
+function TableControls(props: TableControlsProps) {
+  const {
+    onNextPage,
+    onPrevPage,
+    onFirstPage,
+    onLastPage,
+    total,
+    page,
+    pageSize,
+    setPageSize,
+    exportDataGetter
+  } = props
+  const [loadingExportData, setLoadingExportData] = React.useState(false);
+
+  const paginationMenu = <Menu
+    onClick={(e) => {
+      setPageSize(+e.key);
+      onFirstPage();
+    }}
+    items={[
+      ...paginationConfig.options.map((size) => {
+        if (size === -1) {
+          return { key: Number.MAX_SAFE_INTEGER, label: 'All' };
+        }
+        return { key: size, label: size };
+      }),
+    ]}
+  />
+
+  const PaginationRangeText = React.memo(() => {
+    const start = page * pageSize;
+    const end = start + pageSize;
+    if (total === 0) {
+      return <span>0-0</span>;
+    }
+    return <span>{`${start + 1}-${Math.min(end, total)}`}</span>;
+  });
 
   const exportJsonToExcel = (data) => {
     const worksheet = XLSX.utils.json_to_sheet(data);
@@ -128,13 +197,13 @@ export function InteractiveTable(props: InteractiveTableProps) {
   const onExport = async (exportType) => {
     try {
       setLoadingExportData(true);
-      const { data } = await exportDataGetter();
+      const { data, columnNames } = await exportDataGetter();
       switch (exportType.key) {
         case 'xlsx':
           exportJsonToExcel(data);
           break;
         case 'csv':
-          exportJsonToCsv(data, dataSource.columnNames);
+          exportJsonToCsv(data, columnNames);
           break;
         default:
           break;
@@ -158,14 +227,9 @@ export function InteractiveTable(props: InteractiveTableProps) {
     ]}
   />
 
-  const getColumns = useCallback(() => {
-    return columnGen(dataSource.columnNames);
-  }, [dataSource.columnNames]);
-
-  return <div className={'interactive-table'}>
-    {/* Table Controls */}
+  return (
     <div className={'controls'}>
-      <Button type={'text'} onClick={() => setPage(0)}><VerticalRightOutlined/></Button>
+      <Button type={'text'} onClick={onFirstPage}><VerticalRightOutlined/></Button>
       <Button type={'text'} className={'p-0'} onClick={onPrevPage}><LeftOutlined/></Button>
       <div style={{ paddingLeft: 10 }}>
         <Dropdown overlay={paginationMenu} trigger={['click']}>
@@ -176,10 +240,10 @@ export function InteractiveTable(props: InteractiveTableProps) {
         </Dropdown>
       </div>
 
-      &nbsp;&nbsp;of {dataSource.total} &nbsp;&nbsp;
+      &nbsp;&nbsp;of {total} &nbsp;&nbsp;
       <Button type={'text'} className={'p-0'} onClick={onNextPage}><RightOutlined/></Button>
       <Button type={'text'}
-              onClick={() => setPage(Math.ceil(dataSource.total / pageSize) - 1)}><VerticalLeftOutlined/></Button>
+              onClick={onLastPage}><VerticalLeftOutlined/></Button>
 
       <div className={'buttons-container'}>
         {/* Dropdown button to choose excel or csv */}
@@ -193,20 +257,5 @@ export function InteractiveTable(props: InteractiveTableProps) {
         </Dropdown>
       </div>
     </div>
-
-    {/* Table */}
-    <Table
-      pagination={false}
-      loading={loading}
-      scroll={{ x: 200 * getColumns().length }}
-      columns={getColumns()}
-      dataSource={dataSource.data}
-      showSorterTooltip={false}
-      sortDirections={['ascend', 'descend']}
-      onChange={(_, filters, sorter, __) => {
-        onPaginate({ page, pageSize, sorter: { columnKey: sorter['columnKey'], order: sorter['order'] } })
-      }}
-      rowKey={(record) => record[dataSource.primaryKey]}
-    />
-  </div>;
+  );
 }

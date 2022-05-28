@@ -1,5 +1,5 @@
 import { QueryStatus } from '../types';
-import { TabledataSource } from '../../component/InteractiveTable';
+import { TabledataSource } from '../../feature/InteractiveTable';
 
 const initialState = {
   loading: false,
