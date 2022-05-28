@@ -9,15 +9,24 @@ import {
   DownOutlined
 } from '@ant-design/icons';
 import React, { useCallback, useEffect } from 'react';
+import { action } from '../../redux';
 
 export interface dataSourceData {
   [key: string]: any;
 }
 
-export interface TabledataSource {
+export class TabledataSource {
   data: readonly dataSourceData[];
   primaryKey: string;
   total?: number;
+  columnNames: readonly string[];
+
+  constructor() {
+    this.data = [];
+    this.primaryKey = null;
+    this.total = null;
+    this.columnNames = [];
+  }
 }
 
 export interface InteractiveTableProps {
@@ -29,6 +38,10 @@ export interface InteractiveTableProps {
 export interface OnPaginateProps {
   page: number;
   pageSize: number;
+  sorter?: {
+    columnKey: string;
+    order: 'ascend' | 'descend';
+  };
 }
 
 export function InteractiveTable(props: InteractiveTableProps) {
@@ -77,10 +90,10 @@ export function InteractiveTable(props: InteractiveTableProps) {
   }
 
   const getColumns = useCallback(() => {
-    return columnGen(props.dataSource.data);
-  }, [props.dataSource.data]);
+    return columnGen(props.dataSource.columnNames);
+  }, [props.dataSource.columnNames]);
 
-  return <div>
+  return <div className={'interactive-table'}>
     {/* Table Controls */}
     <div className={'controls'}>
       <Button type={'text'} onClick={() => setPage(0)}><VerticalRightOutlined/></Button>
@@ -107,7 +120,18 @@ export function InteractiveTable(props: InteractiveTableProps) {
       scroll={{ x: 200 * getColumns().length }}
       columns={getColumns()}
       dataSource={props.dataSource.data}
+      sortDirections={['ascend', 'descend']}
+      onChange={(_, filters, sorter, __) => {
+        console.log(filters, sorter);
+        props.onPaginate({ page, pageSize, sorter: { columnKey: sorter['columnKey'], order: sorter['order'] } })
+      }}
       rowKey={(record) => record[props.dataSource.primaryKey]}
-    />
+    >
+      {getColumns().map((colName) => (<Table.Column
+        title={colName.title}
+        dataIndex={colName.dataIndex}
+        key={colName.key}
+      />))}
+    </Table>
   </div>;
 }

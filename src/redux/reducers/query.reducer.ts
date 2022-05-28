@@ -4,7 +4,7 @@ import { TabledataSource } from '../../component/InteractiveTable';
 const initialState = {
   loading: false,
   lastQuery: null,
-  dataSource: { data: [], primaryKey: '', total: 0 } as TabledataSource,
+  dataSource: new TabledataSource(),
   error: null,
 };
 

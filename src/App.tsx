@@ -14,7 +14,7 @@ import { QueryActions } from './redux/types';
 function App() {
   const query = useSelector((state: any) => state.queryReducer);
   const onTablePaginate = (props: OnPaginateProps) => {
-    action(QueryActions.EXECUTE_QUERY, { query: query.lastQuery, page: props.page, pageSize: props.pageSize });
+    action(QueryActions.EXECUTE_QUERY, { query: query.lastQuery, ...props });
   };
 
   return (
