@@ -1,3 +1,4 @@
+import React from 'react';
 import './style.css';
 import { Select } from 'antd';
 import { action } from '../../redux';

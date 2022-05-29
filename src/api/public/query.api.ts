@@ -21,7 +21,7 @@ export const getResponseForQuery = async (params: {
     .split('\n')
     .map((row) => row.split(','));
   const csvHeaders = csvDataAsJson.shift();
-  let data: any[] = csvDataAsJson.map((row) => {
+  let data = csvDataAsJson.map((row) => {
     const rowAsJson = {};
     row.forEach((value, index) => {
       rowAsJson[csvHeaders[index]] = value;
@@ -60,7 +60,7 @@ export const getResponseForQuery = async (params: {
   };
 };
 
-export const getColumnSummary = async (tableName: string, columnKey: string) => {
+export const getColumnSummary = async (_tableName: string, _columnKey: string) => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   return {
     max: 30,

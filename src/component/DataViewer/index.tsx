@@ -1,12 +1,12 @@
 import { useSelector } from 'react-redux';
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { InteractiveTable, OnPaginateParams } from '../../feature/InteractiveTable';
 import { action } from '../../redux';
-import { QueryActions } from '../../redux/types';
+import { QueryActions, RootReducer } from '../../redux/types';
 import { getResponseForQuery } from '../../api/public/query.api';
 
 export function DataViewer() {
-  const query = useSelector((state: any) => state.queryReducer);
+  const query = useSelector((state: RootReducer) => state.queryReducer);
   const onTablePaginate = useCallback(
     (params: OnPaginateParams) => {
       if (query.lastQuery) {
