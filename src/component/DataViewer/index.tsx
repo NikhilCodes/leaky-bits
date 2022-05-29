@@ -13,10 +13,13 @@ export function DataViewer() {
         action(QueryActions.EXECUTE_QUERY, { query: query.lastQuery, ...params });
       }
     },
-    [query.lastQuery],
+    [query.lastQuery]
   );
 
-  const getUnPaginatedQueryData = useCallback(() => getResponseForQuery({ query: query.lastQuery }), [query.lastQuery]);
+  const getUnPaginatedQueryData = useCallback(
+    () => getResponseForQuery({ query: query.lastQuery }),
+    [query.lastQuery]
+  );
 
   return (
     <InteractiveTable

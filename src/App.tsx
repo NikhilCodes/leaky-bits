@@ -1,8 +1,6 @@
 import React from 'react';
 import './App.css';
-import {
-  ReflexContainer, ReflexSplitter, ReflexElement, ReflexHandle,
-} from 'react-reflex';
+import { ReflexContainer, ReflexSplitter, ReflexElement, ReflexHandle } from 'react-reflex';
 import Editor from './component/Editor';
 import { DataViewer } from './component/DataViewer';
 
@@ -24,7 +22,7 @@ function App() {
                 height: 5,
                 backgroundColor: 'grey',
                 marginLeft: 'auto',
-                marginRight: 'auto',
+                marginRight: 'auto'
               }}
             />
           </ReflexHandle>

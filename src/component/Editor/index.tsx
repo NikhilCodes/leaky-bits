@@ -11,7 +11,7 @@ export default function Editor() {
     'SELECT * FROM Customers',
     'SELECT * FROM Suppliers',
     'SELECT * FROM Shippers',
-    'SELECT * FROM Regions',
+    'SELECT * FROM Regions'
   ];
   return (
     <div className="editor">

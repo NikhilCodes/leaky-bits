@@ -1,27 +1,18 @@
 import './style.css';
-import {
-  Button, Col, Drawer, Dropdown, Menu, Skeleton, Space, Table, Typography,
-} from 'antd';
-import {
-  RightOutlined,
-  LeftOutlined,
-  VerticalRightOutlined,
-  VerticalLeftOutlined,
-  DownOutlined,
-  MoreOutlined,
-} from '@ant-design/icons';
+import { Button, Col, Drawer, Skeleton, Table, Typography } from 'antd';
+import { MoreOutlined } from '@ant-design/icons';
 import React, { useCallback, useEffect } from 'react';
-import * as XLSX from 'xlsx';
 import {
   HorizontalGridLines,
   VerticalBarSeries,
   VerticalGridLines,
   XAxis,
   XYPlot,
-  YAxis,
+  YAxis
 } from 'react-vis';
 import { getColumnSummary } from '../../api/public/query.api';
 import { SorterResult } from 'antd/es/table/interface';
+import { paginationConfig, TableControls } from './TableControl';
 
 export interface dataSourceData {
   [key: string]: unknown;
@@ -48,7 +39,7 @@ export interface InteractiveTableProps {
   dataSource: TabledataSource;
   loading?: boolean;
   onPaginate: (props: OnPaginateParams) => void;
-  exportDataGetter: () => Promise<{ data, columnNames }>;
+  exportDataGetter: () => Promise<{ data; columnNames }>;
 }
 
 export interface OnPaginateParams {
@@ -60,20 +51,10 @@ export interface OnPaginateParams {
   };
 }
 
-// Configs
-const paginationConfig = {
-  defaultPageSize: 10,
-  options: [5, 10, 50, 100, 500, 1000, -1],
-};
-
-//
-
 export function InteractiveTable(props: InteractiveTableProps) {
   const [page, setPage] = React.useState(0);
   const [pageSize, setPageSize] = React.useState(paginationConfig.defaultPageSize);
-  const {
-    onPaginate, dataSource, exportDataGetter, loading,
-  } = props;
+  const { onPaginate, dataSource, exportDataGetter, loading } = props;
 
   useEffect(() => {
     // TODO: Try debounce for throtting
@@ -102,7 +83,10 @@ export function InteractiveTable(props: InteractiveTableProps) {
     setPage(Math.ceil(dataSource.total / pageSize) - 1);
   }, [dataSource.total, pageSize]);
 
-  const getColumns = useCallback(() => tableColumnGen(dataSource.columnNames, getColumnSummary), [dataSource.columnNames]);
+  const getColumns = useCallback(
+    () => tableColumnGen(dataSource.columnNames, getColumnSummary),
+    [dataSource.columnNames]
+  );
 
   return (
     <div className="interactive-table">
@@ -132,7 +116,7 @@ export function InteractiveTable(props: InteractiveTableProps) {
           onPaginate({
             page,
             pageSize,
-            sorter: { columnKey: sorter.columnKey.toString(), order: sorter.order },
+            sorter: { columnKey: sorter.columnKey.toString(), order: sorter.order }
           });
         }}
         rowKey={(record) => record[dataSource.primaryKey]}
@@ -161,9 +145,7 @@ interface ISummaryData {
 }
 
 const SummaryDrawer = React.memo(function SummaryDrawer(props: SummaryDrawerProp) {
-  const {
-    summaryGetter, columnKey, visible, onClose,
-  } = props;
+  const { summaryGetter, columnKey, visible, onClose } = props;
   const [summary, setSummary] = React.useState<ISummaryData>();
   const [loading, setLoading] = React.useState(true);
   const { artifacts, ...tabulatedSummary } = summary ?? { artifacts: [] };
@@ -185,7 +167,7 @@ const SummaryDrawer = React.memo(function SummaryDrawer(props: SummaryDrawerProp
     for (const key in json) {
       data.push({
         key,
-        value: json[key],
+        value: json[key]
       });
     }
     return data;
@@ -212,31 +194,31 @@ const SummaryDrawer = React.memo(function SummaryDrawer(props: SummaryDrawerProp
                   {
                     key: 'key',
                     title: 'Key',
-                    dataIndex: 'key',
+                    dataIndex: 'key'
                   },
                   {
                     key: 'value',
                     title: 'Value',
-                    dataIndex: 'value',
-                  },
+                    dataIndex: 'value'
+                  }
                 ]}
               />
 
-              <br/>
-              <br/>
+              <br />
+              <br />
 
               <Typography.Title level={4}>Artifacts</Typography.Title>
-              {artifacts.map((artifact, i) => (
-                <>
-                  <Typography.Title level={5}>{artifact.title}</Typography.Title>
-                  <XYPlot key={i} xType="ordinal" width={460} height={300} stackBy="y">
-                    <VerticalGridLines/>
-                    <HorizontalGridLines/>
-                    <XAxis/>
-                    <YAxis/>
-                    <VerticalBarSeries barWidth={0.5} data={artifact.data}/>
+              {artifacts.map((artifact) => (
+                <div key={artifact.title}>
+                  <Typography.Title  level={5}>{artifact.title}</Typography.Title>
+                  <XYPlot xType="ordinal" width={460} height={300} stackBy="y">
+                    <VerticalGridLines />
+                    <HorizontalGridLines />
+                    <XAxis />
+                    <YAxis />
+                    <VerticalBarSeries barWidth={0.5} data={artifact.data} />
                   </XYPlot>
-                </>
+                </div>
               ))}
             </Col>
           </div>
@@ -246,165 +228,11 @@ const SummaryDrawer = React.memo(function SummaryDrawer(props: SummaryDrawerProp
   );
 });
 
-interface TableControlsProps {
-  onNextPage: () => void;
-  onPrevPage: () => void;
-  onFirstPage: () => void;
-  onLastPage: () => void;
-  total: number;
-  page: number;
-  pageSize: number;
-  setPageSize: (pageSize: number) => void;
-  exportDataGetter: () => Promise<{ data, columnNames }>;
-}
-
-const TableControls = React.memo(function TableControls(props: TableControlsProps) {
-  const {
-    onNextPage,
-    onPrevPage,
-    onFirstPage,
-    onLastPage,
-    total,
-    page,
-    pageSize,
-    setPageSize,
-    exportDataGetter,
-  } = props;
-
-  const [loadingExportData, setLoadingExportData] = React.useState(false);
-
-  const paginationMenu = (
-    <Menu
-      onClick={(e) => {
-        setPageSize(+e.key);
-        onFirstPage();
-      }}
-      items={[
-        ...paginationConfig.options.map((size) => {
-          if (size === -1) {
-            return { key: Number.MAX_SAFE_INTEGER, label: 'All' };
-          }
-          return { key: size, label: size };
-        }),
-      ]}
-    />
-  );
-
-  const PaginationRangeText = React.memo(function PaginationRangeText() {
-    const start = page * pageSize;
-    const end = start + pageSize;
-    if (total === 0) {
-      return <span>0-0</span>;
-    }
-    return <span>{`${start + 1}-${Math.min(end, total)}`}</span>;
-  });
-
-  const exportJsonToExcel = (data) => {
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet');
-    XLSX.writeFile(workbook, 'export.xlsx');
-  };
-
-  const exportJsonToCsv = (data, columnNames) => {
-    let csv = `${columnNames.join(',')}\n`;
-    csv += data
-      .map((row) => Object.keys(row)
-        .map((key) => row[key])
-        .join(','))
-      .join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'export.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const onExport = async (exportType) => {
-    try {
-      setLoadingExportData(true);
-      const { data, columnNames } = await exportDataGetter();
-      switch (exportType.key) {
-        case 'xlsx':
-          exportJsonToExcel(data);
-          break;
-        case 'csv':
-          exportJsonToCsv(data, columnNames);
-          break;
-        default:
-          break;
-      }
-    } finally {
-      setLoadingExportData(false);
-    }
-  };
-
-  const exportButtonMenu = (
-    <Menu
-      onClick={onExport}
-      items={[
-        {
-          key: 'csv',
-          label: 'CSV',
-        },
-        {
-          key: 'xlsx',
-          label: 'XLSX',
-        },
-      ]}
-    />
-  );
-
-  return (
-    <div className="controls">
-      <Button type="text" onClick={onFirstPage}>
-        <VerticalRightOutlined/>
-      </Button>
-      <Button type="text" className="p-0" onClick={onPrevPage}>
-        <LeftOutlined/>
-      </Button>
-      <div style={{ paddingLeft: 10 }}>
-        <Dropdown overlay={paginationMenu} trigger={['click']}>
-          <Button style={{ minWidth: 100 }}>
-            <PaginationRangeText/>
-            <DownOutlined/>
-          </Button>
-        </Dropdown>
-      </div>
-      &nbsp;&nbsp;of
-      {' '}
-      {total}
-      {' '}
-      &nbsp;&nbsp;
-      <Button type="text" className="p-0" onClick={onNextPage}>
-        <RightOutlined/>
-      </Button>
-      <Button type="text" onClick={onLastPage}>
-        <VerticalLeftOutlined/>
-      </Button>
-      <div className="buttons-container">
-        {/* Dropdown button to choose excel or csv */}
-        <Dropdown overlay={exportButtonMenu} trigger={['click']}>
-          <Button loading={loadingExportData}>
-            <Space>
-              Export as
-              <DownOutlined/>
-            </Space>
-          </Button>
-        </Dropdown>
-      </div>
-    </div>
-  );
-});
-
 function tableColumnGen(columnNames, summaryGetter?) {
   return columnNames.map((header) => ({
     title: (
       <span>
-        <ShowMoreButton columnKey={header} summaryGetter={summaryGetter}/>
+        <ShowMoreButton columnKey={header} summaryGetter={summaryGetter} />
         <span>{header}</span>
       </span>
     ),
@@ -418,16 +246,15 @@ function tableColumnGen(columnNames, summaryGetter?) {
       if (value == null || value === 'NULL') {
         return <span style={{ color: 'gray' }}>NULL</span>;
       }
-      return (
-        <span>
-          {value}
-        </span>
-      );
-    },
+      return <span>{value}</span>;
+    }
   }));
 }
 
-const ShowMoreButton = React.memo(function ShowMoreButton(props: { columnKey: string; summaryGetter? }) {
+const ShowMoreButton = React.memo(function ShowMoreButton(props: {
+  columnKey: string;
+  summaryGetter?;
+}) {
   const [summaryDrawerVisible, setSummaryDrawerVisible] = React.useState(false);
 
   return (
@@ -439,7 +266,7 @@ const ShowMoreButton = React.memo(function ShowMoreButton(props: { columnKey: st
         }}
         type="text"
         style={{ marginRight: 5 }}
-        icon={<MoreOutlined/>}
+        icon={<MoreOutlined />}
       />
       <SummaryDrawer
         onClose={(e) => {
