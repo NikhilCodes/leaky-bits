@@ -51,3 +51,45 @@ export const getResponseForQuery = async (params: { query: string, page?: number
     primaryKey: `${filename.slice(0, filename.length - 1)}ID`
   };
 }
+
+export const getColumnSummary = async (tableName: string, columnKey: string) => {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return {
+    max: 30,
+    min: 0,
+    avg: 12.223,
+    median: 15,
+    sum: 121,
+    count: 28,
+    distinct: 5,
+    artifacts: [
+      {
+        title: 'Frequency',
+        type: 'histogram',
+        data: [
+          {
+            x: '0',
+            y: 7,
+          },
+          {
+            x: '5',
+            y: 8,
+          },
+          {
+            x: '15',
+            y: 4,
+          },
+          {
+            x: '20',
+            y: 3,
+          },
+          {
+            x: '30',
+            y: 2,
+          }
+        ],
+      },
+      // ... more such artifacts could go here
+    ],
+  };
+}

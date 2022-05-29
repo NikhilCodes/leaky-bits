@@ -10,13 +10,10 @@ do operation on top of existing results.
 
 - pagination
 - sorting
-- filtering
-- search
-- export
-- download
-- edit
-- delete
-- create
+- filter
+- export [csv, xlsx]
+- Link referenced table
+- Resizable Table
 
 ## Toolchain
 

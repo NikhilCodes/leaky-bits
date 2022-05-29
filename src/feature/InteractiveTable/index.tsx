@@ -1,5 +1,5 @@
 import './style.css';
-import { Button, Drawer, Dropdown, Menu, Space, Table } from 'antd';
+import { Button, Col, Drawer, Dropdown, Menu, Skeleton, Space, Table, Typography } from 'antd';
 import {
   RightOutlined,
   LeftOutlined,
@@ -9,6 +9,15 @@ import {
 } from '@ant-design/icons';
 import React, { useCallback, useEffect } from 'react';
 import * as XLSX from 'xlsx';
+import {
+  HorizontalGridLines,
+  VerticalBarSeries,
+  VerticalGridLines,
+  XAxis,
+  XYPlot,
+  YAxis
+} from 'react-vis';
+import { getColumnSummary } from '../../api/public/query.api';
 
 export interface dataSourceData {
   [key: string]: any;
@@ -85,7 +94,7 @@ export function InteractiveTable(props: InteractiveTableProps) {
   }, [dataSource.total, pageSize]);
 
   const getColumns = useCallback(() => {
-    return tableColumnGen(dataSource.columnNames);
+    return tableColumnGen(dataSource.columnNames, getColumnSummary);
   }, [dataSource.columnNames]);
 
   return <div className={'interactive-table'}>
@@ -124,20 +133,99 @@ interface SummaryDrawerProp {
   onClose: (e) => void;
   visible: boolean;
   columnKey: string;
+  summaryGetter: (tableName: string, columnKey: string) => Promise<any>;
+}
+
+interface ISummaryData {
+  max: number;
+  min: number;
+  avg: number;
+  sum: number;
+  count: number;
+  distinct: number;
+  median: number;
+  artifacts: { type: 'histogram' | 'pie', data: any[], title: string }[];
 }
 
 const SummaryDrawer = React.memo((props: SummaryDrawerProp) => {
+  const { summaryGetter, columnKey, visible, onClose } = props;
+  const [summary, setSummary] = React.useState<ISummaryData>();
+  const [loading, setLoading] = React.useState(true);
+  const { artifacts, ...tabulatedSummary } = summary ?? { artifacts: [] };
+  useEffect(() => {
+    if (visible) {
+      setLoading(true);
+      summaryGetter(null, columnKey).then((value) => {
+        setSummary(value);
+      }).finally(() => {
+        setLoading(false);
+      });
+    }
+  }, [columnKey, summaryGetter, visible]);
+
+  const getTableDataFromJson = (json: object) => {
+    const data = [];
+    for (const key in json) {
+      data.push({
+        key,
+        value: json[key]
+      })
+    }
+    return data;
+  }
+
   return (
     <Drawer
-      title={`Summary of ${props.columnKey}`}
+      title={`Summary of ${columnKey}`}
       placement="right"
-      onClose={props.onClose}
-      visible={props.visible}
+      onClose={onClose}
+      visible={visible}
       size={'large'}
     >
-      <p>Some contents...</p>
-      <p>Some contents...</p>
-      <p>Some contents...</p>
+      <div onClick={(e) => e.stopPropagation()}>
+        <Skeleton loading={loading}>
+          <div>
+            <Col span={16}>
+              <Typography.Title level={4}>Aggregate</Typography.Title>
+              <Table
+                pagination={false}
+                showHeader={false}
+                dataSource={getTableDataFromJson(tabulatedSummary)}
+                columns={[
+                  {
+                    key: 'key',
+                    title: 'Key',
+                    dataIndex: 'key',
+                  },
+                  {
+                    key: 'value',
+                    title: 'Value',
+                    dataIndex: 'value',
+                  },
+                ]}
+              />
+
+              <br/>
+              <br/>
+
+              <Typography.Title level={4}>Artifacts</Typography.Title>
+              {artifacts.map((artifact, i) => (<>
+                <Typography.Title level={5}>{artifact.title}</Typography.Title>
+                <XYPlot key={i} xType={'ordinal'} width={460} height={300} stackBy="y">
+                  <VerticalGridLines/>
+                  <HorizontalGridLines/>
+                  <XAxis/>
+                  <YAxis/>
+                  <VerticalBarSeries
+                    barWidth={0.5}
+                    data={artifact.data}
+                  />
+                </XYPlot>
+              </>))}
+            </Col>
+          </div>
+        </Skeleton>
+      </div>
     </Drawer>
   );
 });
@@ -282,11 +370,11 @@ const TableControls = React.memo((props: TableControlsProps) => {
   );
 });
 
-function tableColumnGen(columnNames) {
+function tableColumnGen(columnNames, summaryGetter?) {
   return columnNames.map(header => {
     return {
       title: (<span>
-        <ShowMoreButton columnKey={header}/>
+        <ShowMoreButton columnKey={header} summaryGetter={summaryGetter}/>
         <span>{header}</span>
       </span>),
       dataIndex: header,
@@ -308,7 +396,7 @@ function tableColumnGen(columnNames) {
   });
 }
 
-const ShowMoreButton = React.memo((props: { columnKey: string }) => {
+const ShowMoreButton = React.memo((props: { columnKey: string, summaryGetter? }) => {
   const [summaryDrawerVisible, setSummaryDrawerVisible] = React.useState(false);
 
   return (
@@ -329,6 +417,7 @@ const ShowMoreButton = React.memo((props: { columnKey: string }) => {
         }}
         visible={summaryDrawerVisible}
         columnKey={props.columnKey}
+        summaryGetter={props.summaryGetter}
       />
     </>
   );
