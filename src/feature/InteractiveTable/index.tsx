@@ -95,6 +95,7 @@ export function InteractiveTable(props: InteractiveTableProps) {
         exportDataGetter={exportDataGetter}
         total={dataSource.total}
         page={page}
+        columnKeys={dataSource.columnNames}
         pageSize={pageSize}
         onNextPage={onNextPage}
         onPrevPage={onPrevPage}

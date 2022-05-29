@@ -5,10 +5,10 @@ import {
   DownOutlined,
   LeftOutlined,
   RightOutlined,
-  SearchOutlined,
   VerticalLeftOutlined,
   VerticalRightOutlined
 } from '@ant-design/icons';
+import { ColumnFilter } from './ColumnFilter';
 
 interface TableControlsProps {
   onNextPage: () => void;
@@ -18,6 +18,7 @@ interface TableControlsProps {
   total: number;
   page: number;
   pageSize: number;
+  columnKeys: readonly string[];
   setPageSize: (pageSize: number) => void;
   exportDataGetter: () => Promise<{ data; columnNames }>;
 }
@@ -37,11 +38,11 @@ export const TableControls = React.memo(function TableControls(props: TableContr
     page,
     pageSize,
     setPageSize,
+    columnKeys,
     exportDataGetter
   } = props;
 
   const [loadingExportData, setLoadingExportData] = React.useState(false);
-
   const paginationMenu = (
     <Menu
       onClick={(e) => {
@@ -129,43 +130,47 @@ export const TableControls = React.memo(function TableControls(props: TableContr
     />
   );
 
-  const onClickFilter = () => {
-    // TOD
-  };
-
   return (
     <div className="controls">
       <Button type="text" onClick={onFirstPage}>
-        <VerticalRightOutlined />
+        <VerticalRightOutlined/>
       </Button>
       <Button type="text" className="p-0" onClick={onPrevPage}>
-        <LeftOutlined />
+        <LeftOutlined/>
       </Button>
       <div style={{ paddingLeft: 10 }}>
         <Dropdown overlay={paginationMenu} trigger={['click']}>
           <Button style={{ minWidth: 100 }}>
-            <PaginationRangeText />
-            <DownOutlined />
+            <PaginationRangeText/>
+            <DownOutlined/>
           </Button>
         </Dropdown>
       </div>
       &nbsp;&nbsp;of {total} &nbsp;&nbsp;
       <Button type="text" className="p-0" onClick={onNextPage}>
-        <RightOutlined />
+        <RightOutlined/>
       </Button>
       <Button type="text" onClick={onLastPage}>
-        <VerticalLeftOutlined />
+        <VerticalLeftOutlined/>
       </Button>
-      <Button onClick={onClickFilter}>
-        Filter <SearchOutlined />
-      </Button>
+      <ColumnFilter
+        columnKeys={columnKeys}
+        onFilter={({ filters }) => {
+          onFirstPage();
+          // TODO: Do actual filtering
+          // NOTE: This is a hack to force the table to re-render if you are page !== 0,
+          // basically to simulate what happens when you filter.
+          console.log(filters);
+        }}
+      />
+
       <div className="buttons-container">
         {/* Dropdown button to choose excel or csv */}
         <Dropdown overlay={exportButtonMenu} trigger={['click']}>
           <Button loading={loadingExportData} type={'primary'}>
             <Space>
               Export as
-              <DownOutlined />
+              <DownOutlined/>
             </Space>
           </Button>
         </Dropdown>
