@@ -1,12 +1,14 @@
 import './style.css';
-import { Button, Col, Drawer, Dropdown, Menu, Skeleton, Space, Table, Typography } from 'antd';
+import {
+  Button, Col, Drawer, Dropdown, Menu, Skeleton, Space, Table, Typography,
+} from 'antd';
 import {
   RightOutlined,
   LeftOutlined,
   VerticalRightOutlined,
   VerticalLeftOutlined,
   DownOutlined,
-  MoreOutlined
+  MoreOutlined,
 } from '@ant-design/icons';
 import React, { useCallback, useEffect } from 'react';
 import * as XLSX from 'xlsx';
@@ -16,9 +18,10 @@ import {
   VerticalGridLines,
   XAxis,
   XYPlot,
-  YAxis
+  YAxis,
 } from 'react-vis';
 import { getColumnSummary } from '../../api/public/query.api';
+import { SorterResult } from 'antd/es/table/interface';
 
 export interface dataSourceData {
   [key: string]: any;
@@ -26,8 +29,11 @@ export interface dataSourceData {
 
 export class TabledataSource {
   data: readonly dataSourceData[];
+
   primaryKey: string;
+
   total?: number;
+
   columnNames: readonly string[];
 
   constructor() {
@@ -57,7 +63,7 @@ export interface OnPaginateParams {
 // Configs
 const paginationConfig = {
   defaultPageSize: 10,
-  options: [5, 10, 50, 100, 500, 1000, -1]
+  options: [5, 10, 50, 100, 500, 1000, -1],
 };
 
 //
@@ -65,7 +71,9 @@ const paginationConfig = {
 export function InteractiveTable(props: InteractiveTableProps) {
   const [page, setPage] = React.useState(0);
   const [pageSize, setPageSize] = React.useState(paginationConfig.defaultPageSize);
-  const { onPaginate, dataSource, exportDataGetter, loading } = props;
+  const {
+    onPaginate, dataSource, exportDataGetter, loading,
+  } = props;
 
   useEffect(() => {
     // TODO: Try debounce for throtting
@@ -94,12 +102,10 @@ export function InteractiveTable(props: InteractiveTableProps) {
     setPage(Math.ceil(dataSource.total / pageSize) - 1);
   }, [dataSource.total, pageSize]);
 
-  const getColumns = useCallback(() => {
-    return tableColumnGen(dataSource.columnNames, getColumnSummary);
-  }, [dataSource.columnNames]);
+  const getColumns = useCallback(() => tableColumnGen(dataSource.columnNames, getColumnSummary), [dataSource.columnNames]);
 
   return (
-    <div className={'interactive-table'}>
+    <div className="interactive-table">
       {/* Table Controls */}
       <TableControls
         exportDataGetter={exportDataGetter}
@@ -122,11 +128,11 @@ export function InteractiveTable(props: InteractiveTableProps) {
         dataSource={dataSource.data}
         showSorterTooltip={false}
         sortDirections={['ascend', 'descend']}
-        onChange={(_, filters, sorter, __) => {
+        onChange={(_, filters, sorter: SorterResult<any>, __) => {
           onPaginate({
             page,
             pageSize,
-            sorter: { columnKey: sorter['columnKey'], order: sorter['order'] }
+            sorter: { columnKey: sorter.columnKey.toString(), order: sorter.order },
           });
         }}
         rowKey={(record) => record[dataSource.primaryKey]}
@@ -155,7 +161,9 @@ interface ISummaryData {
 }
 
 const SummaryDrawer = React.memo((props: SummaryDrawerProp) => {
-  const { summaryGetter, columnKey, visible, onClose } = props;
+  const {
+    summaryGetter, columnKey, visible, onClose,
+  } = props;
   const [summary, setSummary] = React.useState<ISummaryData>();
   const [loading, setLoading] = React.useState(true);
   const { artifacts, ...tabulatedSummary } = summary ?? { artifacts: [] };
@@ -177,7 +185,7 @@ const SummaryDrawer = React.memo((props: SummaryDrawerProp) => {
     for (const key in json) {
       data.push({
         key,
-        value: json[key]
+        value: json[key],
       });
     }
     return data;
@@ -189,7 +197,7 @@ const SummaryDrawer = React.memo((props: SummaryDrawerProp) => {
       placement="right"
       onClose={onClose}
       visible={visible}
-      size={'large'}
+      size="large"
     >
       <div onClick={(e) => e.stopPropagation()}>
         <Skeleton loading={loading}>
@@ -204,13 +212,13 @@ const SummaryDrawer = React.memo((props: SummaryDrawerProp) => {
                   {
                     key: 'key',
                     title: 'Key',
-                    dataIndex: 'key'
+                    dataIndex: 'key',
                   },
                   {
                     key: 'value',
                     title: 'Value',
-                    dataIndex: 'value'
-                  }
+                    dataIndex: 'value',
+                  },
                 ]}
               />
 
@@ -221,7 +229,7 @@ const SummaryDrawer = React.memo((props: SummaryDrawerProp) => {
               {artifacts.map((artifact, i) => (
                 <>
                   <Typography.Title level={5}>{artifact.title}</Typography.Title>
-                  <XYPlot key={i} xType={'ordinal'} width={460} height={300} stackBy="y">
+                  <XYPlot key={i} xType="ordinal" width={460} height={300} stackBy="y">
                     <VerticalGridLines />
                     <HorizontalGridLines />
                     <XAxis />
@@ -260,7 +268,7 @@ const TableControls = React.memo((props: TableControlsProps) => {
     page,
     pageSize,
     setPageSize,
-    exportDataGetter
+    exportDataGetter,
   } = props;
   const [loadingExportData, setLoadingExportData] = React.useState(false);
 
@@ -276,7 +284,7 @@ const TableControls = React.memo((props: TableControlsProps) => {
             return { key: Number.MAX_SAFE_INTEGER, label: 'All' };
           }
           return { key: size, label: size };
-        })
+        }),
       ]}
     />
   );
@@ -298,15 +306,11 @@ const TableControls = React.memo((props: TableControlsProps) => {
   };
 
   const exportJsonToCsv = (data, columnNames) => {
-    let csv = columnNames.join(',') + '\n';
+    let csv = `${columnNames.join(',')}\n`;
     csv += data
-      .map((row) => {
-        return Object.keys(row)
-          .map((key) => {
-            return row[key];
-          })
-          .join(',');
-      })
+      .map((row) => Object.keys(row)
+        .map((key) => row[key])
+        .join(','))
       .join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -343,22 +347,22 @@ const TableControls = React.memo((props: TableControlsProps) => {
       items={[
         {
           key: 'csv',
-          label: 'CSV'
+          label: 'CSV',
         },
         {
           key: 'xlsx',
-          label: 'XLSX'
-        }
+          label: 'XLSX',
+        },
       ]}
     />
   );
 
   return (
-    <div className={'controls'}>
-      <Button type={'text'} onClick={onFirstPage}>
+    <div className="controls">
+      <Button type="text" onClick={onFirstPage}>
         <VerticalRightOutlined />
       </Button>
-      <Button type={'text'} className={'p-0'} onClick={onPrevPage}>
+      <Button type="text" className="p-0" onClick={onPrevPage}>
         <LeftOutlined />
       </Button>
       <div style={{ paddingLeft: 10 }}>
@@ -369,14 +373,18 @@ const TableControls = React.memo((props: TableControlsProps) => {
           </Button>
         </Dropdown>
       </div>
-      &nbsp;&nbsp;of {total} &nbsp;&nbsp;
-      <Button type={'text'} className={'p-0'} onClick={onNextPage}>
+      &nbsp;&nbsp;of
+      {' '}
+      {total}
+      {' '}
+&nbsp;&nbsp;
+      <Button type="text" className="p-0" onClick={onNextPage}>
         <RightOutlined />
       </Button>
-      <Button type={'text'} onClick={onLastPage}>
+      <Button type="text" onClick={onLastPage}>
         <VerticalLeftOutlined />
       </Button>
-      <div className={'buttons-container'}>
+      <div className="buttons-container">
         {/* Dropdown button to choose excel or csv */}
         <Dropdown overlay={exportButtonMenu} trigger={['click']}>
           <Button loading={loadingExportData}>
@@ -392,35 +400,30 @@ const TableControls = React.memo((props: TableControlsProps) => {
 });
 
 function tableColumnGen(columnNames, summaryGetter?) {
-  return columnNames.map((header) => {
-    return {
-      title: (
-        <span>
-          <ShowMoreButton columnKey={header} summaryGetter={summaryGetter} />
-          <span>{header}</span>
-        </span>
-      ),
-      dataIndex: header,
-      key: header,
-      sorter: (_, __) => {
-        // Disable sorting on client side.
-        // This can't be undefined for sorting buttons to show up.
-        return 0;
-      },
-      render: (value) => {
-        if (value == null || value === 'NULL') {
-          return <span style={{ color: 'gray' }}>NULL</span>;
-        }
-        return (
-          <span
-          // TODO: Selection handlers
-          >
-            {value}
-          </span>
-        );
+  return columnNames.map((header) => ({
+    title: (
+      <span>
+        <ShowMoreButton columnKey={header} summaryGetter={summaryGetter} />
+        <span>{header}</span>
+      </span>
+    ),
+    dataIndex: header,
+    key: header,
+    sorter: (_, __) =>
+    // Disable sorting on client side.
+    // This can't be undefined for sorting buttons to show up.
+      0,
+    render: (value) => {
+      if (value == null || value === 'NULL') {
+        return <span style={{ color: 'gray' }}>NULL</span>;
       }
-    };
-  });
+      return (
+        <span>
+          {value}
+        </span>
+      );
+    },
+  }));
 }
 
 const ShowMoreButton = React.memo((props: { columnKey: string; summaryGetter? }) => {
@@ -433,7 +436,7 @@ const ShowMoreButton = React.memo((props: { columnKey: string; summaryGetter? })
           e.stopPropagation();
           setSummaryDrawerVisible(true);
         }}
-        type={'text'}
+        type="text"
         style={{ marginRight: 5 }}
         icon={<MoreOutlined />}
       />

@@ -26,7 +26,7 @@ const configureStore = (rootReducer, rootSaga) => {
 
   return {
     store,
-    sagaMiddleware
+    sagaMiddleware,
   };
 };
 
