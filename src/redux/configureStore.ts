@@ -24,10 +24,9 @@ const configureStore = (rootReducer, rootSaga) => {
   // kick off root saga
   sagaMiddleware.run(rootSaga);
 
-
   return {
     store,
-    sagaMiddleware,
+    sagaMiddleware
   };
 };
 

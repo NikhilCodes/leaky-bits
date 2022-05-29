@@ -4,9 +4,7 @@ import querySaga from './query.saga';
 
 // Connect types to sagas
 const rootSaga = function* root() {
-  yield all([
-    fork(querySaga),
-  ]);
+  yield all([fork(querySaga)]);
 };
 
 export default rootSaga;

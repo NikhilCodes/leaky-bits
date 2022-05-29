@@ -7,11 +7,14 @@ import { getResponseForQuery } from '../../api/public/query.api';
 
 export function DataViewer() {
   const query = useSelector((state: any) => state.queryReducer);
-  const onTablePaginate = useCallback((params: OnPaginateParams) => {
-    if (query.lastQuery) {
-      action(QueryActions.EXECUTE_QUERY, { query: query.lastQuery, ...params });
-    }
-  }, [query.lastQuery]);
+  const onTablePaginate = useCallback(
+    (params: OnPaginateParams) => {
+      if (query.lastQuery) {
+        action(QueryActions.EXECUTE_QUERY, { query: query.lastQuery, ...params });
+      }
+    },
+    [query.lastQuery]
+  );
 
   const getUnPaginatedQueryData = useCallback(() => {
     return getResponseForQuery({ query: query.lastQuery });

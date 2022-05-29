@@ -18,18 +18,18 @@ do operation on top of existing results.
 ## Toolchain
 
 |        For         |                            I used                            |
-|:------------------:|:------------------------------------------------------------:|
+| :----------------: | :----------------------------------------------------------: |
 | Frontend Framework |                [React](https://reactjs.org/)                 |
 |     UI Library     |               [AntDesign](https://ant.design)                |
 |  State Management  |           [Redux Saga](https://redux-saga.js.org)            |
-|    XLSX Export     | [npmjs.com/package/XLSX](https://www.npmjs.com/package/xlsx) |  
+|    XLSX Export     | [npmjs.com/package/XLSX](https://www.npmjs.com/package/xlsx) |
 
 ## Page Load Metrics
 
 ## Optimizations and Improvements
 
 - Made use of `useCallback` to prevent unnecessary re-renders
-- Moved `<InterativeTable/>` component from <App/>  to `<DataViewer/>` component, which stopped the re-rendering of the
+- Moved `<InterativeTable/>` component from <App/> to `<DataViewer/>` component, which stopped the re-rendering of the
   entire app when paginating or sorting.
 - Added resolutions to package.json that helped with performance increase of AntD Table, preventing unnecessary rerender
   when

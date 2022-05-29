@@ -5,7 +5,7 @@ const initialState = {
   loading: false,
   lastQuery: null,
   dataSource: new TabledataSource(),
-  error: null,
+  error: null
 };
 
 const queryReducer = (state = initialState, action) => {
@@ -25,7 +25,7 @@ const queryReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         success: false,
-        error: action.error,
+        error: action.error
       };
     default:
       return state;

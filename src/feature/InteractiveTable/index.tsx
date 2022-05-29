@@ -5,7 +5,8 @@ import {
   LeftOutlined,
   VerticalRightOutlined,
   VerticalLeftOutlined,
-  DownOutlined, MoreOutlined
+  DownOutlined,
+  MoreOutlined
 } from '@ant-design/icons';
 import React, { useCallback, useEffect } from 'react';
 import * as XLSX from 'xlsx';
@@ -56,7 +57,7 @@ export interface OnPaginateParams {
 // Configs
 const paginationConfig = {
   defaultPageSize: 10,
-  options: [5, 10, 50, 100, 500, 1000, -1],
+  options: [5, 10, 50, 100, 500, 1000, -1]
 };
 
 //
@@ -76,7 +77,7 @@ export function InteractiveTable(props: InteractiveTableProps) {
   }, [props.dataSource.total]);
 
   const onPrevPage = useCallback(() => {
-    setPage((p) => p ? p - 1 : p);
+    setPage((p) => (p ? p - 1 : p));
   }, []);
 
   const onNextPage = useCallback(() => {
@@ -90,43 +91,49 @@ export function InteractiveTable(props: InteractiveTableProps) {
   }, []);
 
   const onLastPage = useCallback(() => {
-    setPage(Math.ceil(dataSource.total / pageSize) - 1)
+    setPage(Math.ceil(dataSource.total / pageSize) - 1);
   }, [dataSource.total, pageSize]);
 
   const getColumns = useCallback(() => {
     return tableColumnGen(dataSource.columnNames, getColumnSummary);
   }, [dataSource.columnNames]);
 
-  return <div className={'interactive-table'}>
-    {/* Table Controls */}
-    <TableControls
-      exportDataGetter={exportDataGetter}
-      total={dataSource.total}
-      page={page}
-      pageSize={pageSize}
-      onNextPage={onNextPage}
-      onPrevPage={onPrevPage}
-      onFirstPage={onFirstPage}
-      onLastPage={onLastPage}
-      setPageSize={setPageSize}
-    />
+  return (
+    <div className={'interactive-table'}>
+      {/* Table Controls */}
+      <TableControls
+        exportDataGetter={exportDataGetter}
+        total={dataSource.total}
+        page={page}
+        pageSize={pageSize}
+        onNextPage={onNextPage}
+        onPrevPage={onPrevPage}
+        onFirstPage={onFirstPage}
+        onLastPage={onLastPage}
+        setPageSize={setPageSize}
+      />
 
-    {/* Table */}
-    <Table
-      pagination={false}
-      loading={loading}
-      scroll={{ x: 200 * getColumns().length }}
-      columns={getColumns()}
-      dataSource={dataSource.data}
-      showSorterTooltip={false}
-      sortDirections={['ascend', 'descend']}
-      onChange={(_, filters, sorter, __) => {
-        onPaginate({ page, pageSize, sorter: { columnKey: sorter['columnKey'], order: sorter['order'] } })
-      }}
-      rowKey={(record) => record[dataSource.primaryKey]}
-      sticky
-    />
-  </div>;
+      {/* Table */}
+      <Table
+        pagination={false}
+        loading={loading}
+        scroll={{ x: 200 * getColumns().length }}
+        columns={getColumns()}
+        dataSource={dataSource.data}
+        showSorterTooltip={false}
+        sortDirections={['ascend', 'descend']}
+        onChange={(_, filters, sorter, __) => {
+          onPaginate({
+            page,
+            pageSize,
+            sorter: { columnKey: sorter['columnKey'], order: sorter['order'] }
+          });
+        }}
+        rowKey={(record) => record[dataSource.primaryKey]}
+        sticky
+      />
+    </div>
+  );
 }
 
 interface SummaryDrawerProp {
@@ -144,7 +151,7 @@ interface ISummaryData {
   count: number;
   distinct: number;
   median: number;
-  artifacts: { type: 'histogram' | 'pie', data: any[], title: string }[];
+  artifacts: { type: 'histogram' | 'pie'; data: any[]; title: string }[];
 }
 
 const SummaryDrawer = React.memo((props: SummaryDrawerProp) => {
@@ -155,11 +162,13 @@ const SummaryDrawer = React.memo((props: SummaryDrawerProp) => {
   useEffect(() => {
     if (visible) {
       setLoading(true);
-      summaryGetter(null, columnKey).then((value) => {
-        setSummary(value);
-      }).finally(() => {
-        setLoading(false);
-      });
+      summaryGetter(null, columnKey)
+        .then((value) => {
+          setSummary(value);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
   }, [columnKey, summaryGetter, visible]);
 
@@ -169,10 +178,10 @@ const SummaryDrawer = React.memo((props: SummaryDrawerProp) => {
       data.push({
         key,
         value: json[key]
-      })
+      });
     }
     return data;
-  }
+  };
 
   return (
     <Drawer
@@ -195,33 +204,32 @@ const SummaryDrawer = React.memo((props: SummaryDrawerProp) => {
                   {
                     key: 'key',
                     title: 'Key',
-                    dataIndex: 'key',
+                    dataIndex: 'key'
                   },
                   {
                     key: 'value',
                     title: 'Value',
-                    dataIndex: 'value',
-                  },
+                    dataIndex: 'value'
+                  }
                 ]}
               />
 
-              <br/>
-              <br/>
+              <br />
+              <br />
 
               <Typography.Title level={4}>Artifacts</Typography.Title>
-              {artifacts.map((artifact, i) => (<>
-                <Typography.Title level={5}>{artifact.title}</Typography.Title>
-                <XYPlot key={i} xType={'ordinal'} width={460} height={300} stackBy="y">
-                  <VerticalGridLines/>
-                  <HorizontalGridLines/>
-                  <XAxis/>
-                  <YAxis/>
-                  <VerticalBarSeries
-                    barWidth={0.5}
-                    data={artifact.data}
-                  />
-                </XYPlot>
-              </>))}
+              {artifacts.map((artifact, i) => (
+                <>
+                  <Typography.Title level={5}>{artifact.title}</Typography.Title>
+                  <XYPlot key={i} xType={'ordinal'} width={460} height={300} stackBy="y">
+                    <VerticalGridLines />
+                    <HorizontalGridLines />
+                    <XAxis />
+                    <YAxis />
+                    <VerticalBarSeries barWidth={0.5} data={artifact.data} />
+                  </XYPlot>
+                </>
+              ))}
             </Col>
           </div>
         </Skeleton>
@@ -253,23 +261,25 @@ const TableControls = React.memo((props: TableControlsProps) => {
     pageSize,
     setPageSize,
     exportDataGetter
-  } = props
+  } = props;
   const [loadingExportData, setLoadingExportData] = React.useState(false);
 
-  const paginationMenu = <Menu
-    onClick={(e) => {
-      setPageSize(+e.key);
-      onFirstPage();
-    }}
-    items={[
-      ...paginationConfig.options.map((size) => {
-        if (size === -1) {
-          return { key: Number.MAX_SAFE_INTEGER, label: 'All' };
-        }
-        return { key: size, label: size };
-      }),
-    ]}
-  />
+  const paginationMenu = (
+    <Menu
+      onClick={(e) => {
+        setPageSize(+e.key);
+        onFirstPage();
+      }}
+      items={[
+        ...paginationConfig.options.map((size) => {
+          if (size === -1) {
+            return { key: Number.MAX_SAFE_INTEGER, label: 'All' };
+          }
+          return { key: size, label: size };
+        })
+      ]}
+    />
+  );
 
   const PaginationRangeText = React.memo(() => {
     const start = page * pageSize;
@@ -283,17 +293,21 @@ const TableControls = React.memo((props: TableControlsProps) => {
   const exportJsonToExcel = (data) => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet");
-    XLSX.writeFile(workbook, "export.xlsx");
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet');
+    XLSX.writeFile(workbook, 'export.xlsx');
   };
 
   const exportJsonToCsv = (data, columnNames) => {
     let csv = columnNames.join(',') + '\n';
-    csv += data.map((row) => {
-      return Object.keys(row).map((key) => {
-        return row[key];
-      }).join(',');
-    }).join('\n');
+    csv += data
+      .map((row) => {
+        return Object.keys(row)
+          .map((key) => {
+            return row[key];
+          })
+          .join(',');
+      })
+      .join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -302,7 +316,7 @@ const TableControls = React.memo((props: TableControlsProps) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }
+  };
 
   const onExport = async (exportType) => {
     try {
@@ -321,47 +335,54 @@ const TableControls = React.memo((props: TableControlsProps) => {
     } finally {
       setLoadingExportData(false);
     }
-  }
+  };
 
-  const exportButtonMenu = <Menu
-    onClick={onExport}
-    items={[
-      {
-        key: 'csv',
-        label: 'CSV',
-      },
-      {
-        key: 'xlsx',
-        label: 'XLSX',
-      },
-    ]}
-  />
+  const exportButtonMenu = (
+    <Menu
+      onClick={onExport}
+      items={[
+        {
+          key: 'csv',
+          label: 'CSV'
+        },
+        {
+          key: 'xlsx',
+          label: 'XLSX'
+        }
+      ]}
+    />
+  );
 
   return (
     <div className={'controls'}>
-      <Button type={'text'} onClick={onFirstPage}><VerticalRightOutlined/></Button>
-      <Button type={'text'} className={'p-0'} onClick={onPrevPage}><LeftOutlined/></Button>
+      <Button type={'text'} onClick={onFirstPage}>
+        <VerticalRightOutlined />
+      </Button>
+      <Button type={'text'} className={'p-0'} onClick={onPrevPage}>
+        <LeftOutlined />
+      </Button>
       <div style={{ paddingLeft: 10 }}>
         <Dropdown overlay={paginationMenu} trigger={['click']}>
           <Button style={{ minWidth: 100 }}>
-            <PaginationRangeText/>
-            <DownOutlined/>
+            <PaginationRangeText />
+            <DownOutlined />
           </Button>
         </Dropdown>
       </div>
-
       &nbsp;&nbsp;of {total} &nbsp;&nbsp;
-      <Button type={'text'} className={'p-0'} onClick={onNextPage}><RightOutlined/></Button>
-      <Button type={'text'}
-              onClick={onLastPage}><VerticalLeftOutlined/></Button>
-
+      <Button type={'text'} className={'p-0'} onClick={onNextPage}>
+        <RightOutlined />
+      </Button>
+      <Button type={'text'} onClick={onLastPage}>
+        <VerticalLeftOutlined />
+      </Button>
       <div className={'buttons-container'}>
         {/* Dropdown button to choose excel or csv */}
         <Dropdown overlay={exportButtonMenu} trigger={['click']}>
           <Button loading={loadingExportData}>
             <Space>
               Export as
-              <DownOutlined/>
+              <DownOutlined />
             </Space>
           </Button>
         </Dropdown>
@@ -371,12 +392,14 @@ const TableControls = React.memo((props: TableControlsProps) => {
 });
 
 function tableColumnGen(columnNames, summaryGetter?) {
-  return columnNames.map(header => {
+  return columnNames.map((header) => {
     return {
-      title: (<span>
-        <ShowMoreButton columnKey={header} summaryGetter={summaryGetter}/>
-        <span>{header}</span>
-      </span>),
+      title: (
+        <span>
+          <ShowMoreButton columnKey={header} summaryGetter={summaryGetter} />
+          <span>{header}</span>
+        </span>
+      ),
       dataIndex: header,
       key: header,
       sorter: (_, __) => {
@@ -386,17 +409,21 @@ function tableColumnGen(columnNames, summaryGetter?) {
       },
       render: (value) => {
         if (value == null || value === 'NULL') {
-          return <span style={{ color: 'gray' }}>NULL</span>
+          return <span style={{ color: 'gray' }}>NULL</span>;
         }
-        return <span
+        return (
+          <span
           // TODO: Selection handlers
-        >{value}</span>
-      },
+          >
+            {value}
+          </span>
+        );
+      }
     };
   });
 }
 
-const ShowMoreButton = React.memo((props: { columnKey: string, summaryGetter? }) => {
+const ShowMoreButton = React.memo((props: { columnKey: string; summaryGetter? }) => {
   const [summaryDrawerVisible, setSummaryDrawerVisible] = React.useState(false);
 
   return (
@@ -408,7 +435,7 @@ const ShowMoreButton = React.memo((props: { columnKey: string, summaryGetter? })
         }}
         type={'text'}
         style={{ marginRight: 5 }}
-        icon={<MoreOutlined/>}
+        icon={<MoreOutlined />}
       />
       <SummaryDrawer
         onClose={(e) => {
@@ -421,4 +448,4 @@ const ShowMoreButton = React.memo((props: { columnKey: string, summaryGetter? })
       />
     </>
   );
-})
+});

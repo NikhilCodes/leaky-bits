@@ -10,14 +10,21 @@ export default function Editor() {
     'SELECT * FROM Customers',
     'SELECT * FROM Suppliers',
     'SELECT * FROM Shippers',
-    'SELECT * FROM Regions',
+    'SELECT * FROM Regions'
   ];
   return (
     <div className="editor">
-      <Select className={'query-select'} onSelect={(v) => {
-        action(QueryActions.EXECUTE_QUERY, { pageSize: 10, page: 0, query: v });
-      }}>
-        {queryList.map((q) => <Select.Option key={q} value={q}>{q}</Select.Option>)}
+      <Select
+        className={'query-select'}
+        onSelect={(v) => {
+          action(QueryActions.EXECUTE_QUERY, { pageSize: 10, page: 0, query: v });
+        }}
+      >
+        {queryList.map((q) => (
+          <Select.Option key={q} value={q}>
+            {q}
+          </Select.Option>
+        ))}
       </Select>
     </div>
   );

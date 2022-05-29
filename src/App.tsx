@@ -1,11 +1,6 @@
 import React from 'react';
 import './App.css';
-import {
-  ReflexContainer,
-  ReflexSplitter,
-  ReflexElement,
-  ReflexHandle,
-} from 'react-reflex';
+import { ReflexContainer, ReflexSplitter, ReflexElement, ReflexHandle } from 'react-reflex';
 import Editor from './component/Editor';
 import { DataViewer } from './component/DataViewer';
 
@@ -14,10 +9,10 @@ function App() {
     <div className="App">
       <ReflexContainer>
         <ReflexElement resizeHeight={true} size={200}>
-          <Editor/>
+          <Editor />
         </ReflexElement>
 
-        <ReflexSplitter propagate={true}/>
+        <ReflexSplitter propagate={true} />
 
         <ReflexElement minSize={50} resizeHeight={true}>
           <ReflexHandle>
@@ -27,11 +22,11 @@ function App() {
                 height: 5,
                 backgroundColor: 'grey',
                 marginLeft: 'auto',
-                marginRight: 'auto',
+                marginRight: 'auto'
               }}
             />
           </ReflexHandle>
-          <DataViewer/>
+          <DataViewer />
         </ReflexElement>
       </ReflexContainer>
     </div>

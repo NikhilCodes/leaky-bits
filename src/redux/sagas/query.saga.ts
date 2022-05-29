@@ -15,7 +15,5 @@ export function* executeQuery(action) {
 }
 
 export default function* querySaga() {
-  yield all([
-    takeLatest(QueryActions.EXECUTE_QUERY, executeQuery),
-  ]);
+  yield all([takeLatest(QueryActions.EXECUTE_QUERY, executeQuery)]);
 }

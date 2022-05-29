@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 import queryReducer from './query.reducer';
 
 const allReducers = {
-  queryReducer,
+  queryReducer
 };
 
 const rootReducer = combineReducers(allReducers);
