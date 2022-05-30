@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Button, Col, Input, Modal, Row, Select } from 'antd';
 import { MinusOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 
@@ -55,6 +55,30 @@ export const ColumnFilter = React.memo(function ColumnFilter(props: ColumnFilter
     setFilterVisible(false);
   };
 
+  const onChangeColumnKey = (i, v) => {
+    filters[i].columnKey = v;
+    const newFilters = [...filters];
+    setFilters(newFilters);
+  };
+
+  const onChangeOperator = (i, v) => {
+    filters[i].operator = v;
+    const newFilters = [...filters];
+    setFilters(newFilters);
+  }
+
+  const onChangeValue = (i, v) => {
+    filters[i].value = v.target.value;
+    const newFilters = [...filters];
+    setFilters(newFilters);
+  }
+
+  const onChangeAndOr = (i, v) => {
+    filters[i].andOr = v;
+    const newFilters = [...filters];
+    setFilters(newFilters);
+  }
+
   return (
     <>
       <Button onClick={showFilter}>
@@ -78,11 +102,7 @@ export const ColumnFilter = React.memo(function ColumnFilter(props: ColumnFilter
                   <Select
                     style={{ width: '100%' }}
                     value={filter.columnKey}
-                    onChange={(v) => {
-                      filters[i].columnKey = v;
-                      const newFilters = [...filters];
-                      setFilters(newFilters);
-                    }}
+                    onChange={onChangeColumnKey.bind(this, i)}
                   >
                     {columnKeys.map((columnKey) => (
                       <Select.Option key={columnKey}>{columnKey}</Select.Option>
@@ -93,11 +113,7 @@ export const ColumnFilter = React.memo(function ColumnFilter(props: ColumnFilter
                   <Select
                     style={{ width: '100%' }}
                     value={filter.operator}
-                    onChange={(v) => {
-                      filters[i].operator = v;
-                      const newFilters = [...filters];
-                      setFilters(newFilters);
-                    }}
+                    onChange={onChangeOperator.bind(this, i)}
                   >
                     {SUPPORTED_OPERATORS.map((op) => (
                       <Select.Option key={op}>{op}</Select.Option>
@@ -107,11 +123,7 @@ export const ColumnFilter = React.memo(function ColumnFilter(props: ColumnFilter
                 <Col flex={1}>
                   <Input
                     value={filter.value}
-                    onChange={(e) => {
-                      filters[i].value = e.target.value;
-                      const newFilters = [...filters];
-                      setFilters(newFilters);
-                    }}
+                    onChange={onChangeValue.bind(this, i)}
                   />
                 </Col>
                 {i !== filters.length - 1 && (
@@ -119,11 +131,7 @@ export const ColumnFilter = React.memo(function ColumnFilter(props: ColumnFilter
                     <Select
                       style={{ width: '100%' }}
                       value={filter.andOr}
-                      onChange={(v) => {
-                        filters[i].andOr = AndOr[v];
-                        const newFilters = [...filters];
-                        setFilters(newFilters);
-                      }}
+                      onChange={onChangeAndOr.bind(this, i)}
                     >
                       {['OR', 'AND'].map((v) => (
                         <Select.Option key={v}>{v}</Select.Option>

@@ -208,8 +208,8 @@ const SummaryDrawer = React.memo(function SummaryDrawer(props: SummaryDrawerProp
               <br />
 
               <Typography.Title level={4}>Artifacts</Typography.Title>
-              {artifacts.map((artifact) => (
-                <div key={artifact.title}>
+              {artifacts.map((artifact, i) => (
+                <div key={artifact.title + i}>
                   <Typography.Title level={5}>{artifact.title}</Typography.Title>
                   <XYPlot xType="ordinal" width={460} height={300} stackBy="y">
                     <VerticalGridLines />
