@@ -12,17 +12,17 @@ do operation on top of existing results.
 - sorting
 - filter
 - export [csv, xlsx]
-- Link referenced table
 - Resizable Table
 
 ## Toolchain
 
-|        For         |                            I used                            |
-| :----------------: | :----------------------------------------------------------: |
-| Frontend Framework |                [React](https://reactjs.org/)                 |
-|     UI Library     |               [AntDesign](https://ant.design)                |
-|  State Management  |           [Redux Saga](https://redux-saga.js.org)            |
-|    XLSX Export     | [npmjs.com/package/XLSX](https://www.npmjs.com/package/xlsx) |
+|        For         |                           I used                           |
+|:------------------:|:----------------------------------------------------------:|
+| Frontend Framework |               [React](https://reactjs.org/)                |
+|     UI Library     |              [AntDesign](https://ant.design)               |
+|  State Management  |          [Redux Saga](https://redux-saga.js.org)           |
+|    XLSX Export     |         [XLSX](https://www.npmjs.com/package/xlsx)         |
+|  Resizable Layour  | [react-reflex](https://www.npmjs.com/package/react-reflex) |
 
 ## Page Load Metrics
 ![](https://i.ibb.co/dWwHV1F/Screenshot-2022-05-31-at-12-37-32-AM.png)
