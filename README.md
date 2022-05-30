@@ -22,7 +22,7 @@ do operation on top of existing results.
 |     UI Library     |              [AntDesign](https://ant.design)               |
 |  State Management  |          [Redux Saga](https://redux-saga.js.org)           |
 |    XLSX Export     |         [XLSX](https://www.npmjs.com/package/xlsx)         |
-|  Resizable Layour  | [react-reflex](https://www.npmjs.com/package/react-reflex) |
+|  Resizable Layout  | [react-reflex](https://www.npmjs.com/package/react-reflex) |
 
 ## Page Load Metrics
 ![](https://i.ibb.co/dWwHV1F/Screenshot-2022-05-31-at-12-37-32-AM.png)
