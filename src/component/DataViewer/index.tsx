@@ -1,10 +1,11 @@
 import { useSelector } from 'react-redux';
-import React, { useCallback } from 'react';
-import { InteractiveTable, OnPaginateParams } from '../../feature/InteractiveTable';
+import React, { Suspense, useCallback } from 'react';
 import { action } from '../../redux';
 import { QueryActions, RootReducer } from '../../redux/types';
 import { getResponseForQuery } from '../../api/public/query.api';
-
+import { OnPaginateParams } from '../../feature/InteractiveTable';
+import { Spin } from 'antd';
+const InteractiveTable = React.lazy(() => import('../../feature/InteractiveTable'));
 export function DataViewer() {
   const query = useSelector((state: RootReducer) => state.queryReducer);
   const onTablePaginate = useCallback(
@@ -22,11 +23,13 @@ export function DataViewer() {
   );
 
   return (
-    <InteractiveTable
-      dataSource={query.dataSource}
-      onPaginate={onTablePaginate}
-      exportDataGetter={getUnPaginatedQueryData}
-      loading={query.loading}
-    />
+    <Suspense fallback={<Spin/>}>
+      <InteractiveTable
+        dataSource={query.dataSource}
+        onPaginate={onTablePaginate}
+        exportDataGetter={getUnPaginatedQueryData}
+        loading={query.loading}
+      />
+    </Suspense>
   );
 }

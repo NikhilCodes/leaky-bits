@@ -51,7 +51,7 @@ export interface OnPaginateParams {
   };
 }
 
-export function InteractiveTable(props: InteractiveTableProps) {
+export default function InteractiveTable(props: InteractiveTableProps) {
   const [page, setPage] = React.useState(0);
   const [pageSize, setPageSize] = React.useState(paginationConfig.defaultPageSize);
   const { onPaginate, dataSource, exportDataGetter, loading } = props;

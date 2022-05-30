@@ -15,6 +15,12 @@ export default function Editor() {
   ];
   return (
     <div className="editor">
+      <div style={{position: 'absolute', top: 0}}>
+        NOTE: Originally, I wanted it to be a editor, but for purpose of test demo, I just use a select box to select query. Hence the feature to drag the window.
+        <br/>
+        NOTE: The spinner you see in the table will spin for exactly one second, since I&apos;m simulating how api would behave if it were fetched from actual server.
+        It is not a unintentional delay.
+      </div>
       <Select
         className="query-select"
         onSelect={(v) => {
@@ -27,6 +33,9 @@ export default function Editor() {
           </Select.Option>
         ))}
       </Select>
+      <div style={{position: 'absolute', bottom: 0}}>
+        NOTE: You can drag adjust the split size by dragging the handle below
+      </div>
     </div>
   );
 }
