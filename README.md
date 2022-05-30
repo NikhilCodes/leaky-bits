@@ -25,7 +25,7 @@ do operation on top of existing results.
 |    XLSX Export     | [npmjs.com/package/XLSX](https://www.npmjs.com/package/xlsx) |
 
 ## Page Load Metrics
-
+![](https://i.ibb.co/dWwHV1F/Screenshot-2022-05-31-at-12-37-32-AM.png)
 ## Optimizations and Improvements
 
 - Made use of `useCallback` to prevent unnecessary re-renders
@@ -37,3 +37,6 @@ do operation on top of existing results.
 - Used `React.memo` on Table Control component to prevent unnecessary re-renders.
   - Before: ![Image](https://i.ibb.co/nwFb3sC/Screenshot-2022-05-29-at-12-15-26-AM.png)
   - After: ![Image](https://i.ibb.co/2FqcP3D/Screenshot-2022-05-29-at-12-11-21-AM.png)
+- Applied code-splitting and lazy loading to `<InteractiveTable/>` component, which improves page load time.
+  - Before: ![Image](https://i.ibb.co/crLyMkk/Screenshot-2022-05-31-at-12-42-19-AM.png)
+  - After: ![Image](https://i.ibb.co/R4MXWCS/Screenshot-2022-05-31-at-12-41-30-AM.png)
