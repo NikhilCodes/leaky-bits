@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import './App.css';
 import { ReflexContainer, ReflexSplitter, ReflexElement, ReflexHandle } from 'react-reflex';
-import Editor from './component/Editor';
-import { DataViewer } from './component/DataViewer';
+const Editor = React.lazy(() => import('./component/Editor'));
+import DataViewer from './component/DataViewer';
+import { Spin } from 'antd';
 
 function App() {
   return (
     <div className="App">
       <ReflexContainer>
         <ReflexElement resizeHeight size={200}>
-          <Editor />
+          <Suspense fallback={<Spin/>}>
+            <Editor />
+          </Suspense>
         </ReflexElement>
 
         <ReflexSplitter propagate />

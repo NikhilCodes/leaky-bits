@@ -6,7 +6,7 @@ import { getResponseForQuery } from '../../api/public/query.api';
 import { OnPaginateParams } from '../../feature/InteractiveTable';
 import { Spin } from 'antd';
 const InteractiveTable = React.lazy(() => import('../../feature/InteractiveTable'));
-export function DataViewer() {
+export default function DataViewer() {
   const query = useSelector((state: RootReducer) => state.queryReducer);
   const onTablePaginate = useCallback(
     (params: OnPaginateParams) => {
