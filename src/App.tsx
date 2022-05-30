@@ -16,15 +16,7 @@ function App() {
 
         <ReflexElement minSize={50} resizeHeight>
           <ReflexHandle>
-            <div
-              style={{
-                width: 100,
-                height: 5,
-                backgroundColor: 'grey',
-                marginLeft: 'auto',
-                marginRight: 'auto'
-              }}
-            />
+            <div className={'handle'} />
           </ReflexHandle>
           <DataViewer />
         </ReflexElement>

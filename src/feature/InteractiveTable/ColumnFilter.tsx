@@ -4,7 +4,7 @@ import { MinusOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 
 export enum AndOr {
   AND = 'AND',
-  OR = 'OR',
+  OR = 'OR'
 }
 
 export interface ColumnFilter {
@@ -25,13 +25,26 @@ export interface ColumnFilterProps {
 }
 
 export const ColumnFilter = React.memo(function ColumnFilter(props: ColumnFilterProps) {
-  const SUPPORTED_OPERATORS = ['=', '>', '<', '>=', '<=', '<>', 'IN', 'NOT IN', 'LIKE', 'NOT LIKE', 'IS NULL', 'IS NOT NULL'];
+  const SUPPORTED_OPERATORS = [
+    '=',
+    '>',
+    '<',
+    '>=',
+    '<=',
+    '<>',
+    'IN',
+    'NOT IN',
+    'LIKE',
+    'NOT LIKE',
+    'IS NULL',
+    'IS NOT NULL'
+  ];
   const { columnKeys, onFilter } = props;
   const [filterVisible, setFilterVisible] = React.useState(false);
   const [filters, setFilters] = React.useState<ColumnFilter[]>([]);
   const onAddFilter = () => {
     setFilters([...filters, { columnKey: '', operator: '', value: '' }]);
-  }
+  };
 
   const showFilter = () => {
     setFilterVisible(true);
@@ -40,12 +53,12 @@ export const ColumnFilter = React.memo(function ColumnFilter(props: ColumnFilter
   const closeFilter = (e?) => {
     e?.stopPropagation();
     setFilterVisible(false);
-  }
+  };
 
   return (
     <>
       <Button onClick={showFilter}>
-        Filter <SearchOutlined/>
+        Filter <SearchOutlined />
       </Button>
       <Modal
         width={800}
@@ -55,7 +68,8 @@ export const ColumnFilter = React.memo(function ColumnFilter(props: ColumnFilter
           closeFilter(e);
           onFilter({ filters });
         }}
-        title={'Filter'}>
+        title={'Filter'}
+      >
         <Col>
           {filters.map((filter, i) => {
             return (
@@ -70,7 +84,9 @@ export const ColumnFilter = React.memo(function ColumnFilter(props: ColumnFilter
                       setFilters(newFilters);
                     }}
                   >
-                    {columnKeys.map((columnKey) => <Select.Option key={columnKey}>{columnKey}</Select.Option>)}
+                    {columnKeys.map((columnKey) => (
+                      <Select.Option key={columnKey}>{columnKey}</Select.Option>
+                    ))}
                   </Select>
                 </Col>
                 <Col span={4}>
@@ -83,7 +99,9 @@ export const ColumnFilter = React.memo(function ColumnFilter(props: ColumnFilter
                       setFilters(newFilters);
                     }}
                   >
-                    {SUPPORTED_OPERATORS.map((op) => <Select.Option key={op}>{op}</Select.Option>)}
+                    {SUPPORTED_OPERATORS.map((op) => (
+                      <Select.Option key={op}>{op}</Select.Option>
+                    ))}
                   </Select>
                 </Col>
                 <Col flex={1}>
@@ -96,37 +114,43 @@ export const ColumnFilter = React.memo(function ColumnFilter(props: ColumnFilter
                     }}
                   />
                 </Col>
-                {(i !== filters.length - 1) && <Col span={4}>
-                  <Select
-                    style={{ width: '100%' }}
-                    value={filter.andOr}
-                    onChange={(v) => {
-                      filters[i].andOr = AndOr[v];
-                      const newFilters = [...filters];
-                      setFilters(newFilters);
-                    }}
-                  >
-                    {['OR', 'AND'].map((v) => <Select.Option key={v}>{v}</Select.Option>)}
-                  </Select>
-                </Col>}
+                {i !== filters.length - 1 && (
+                  <Col span={4}>
+                    <Select
+                      style={{ width: '100%' }}
+                      value={filter.andOr}
+                      onChange={(v) => {
+                        filters[i].andOr = AndOr[v];
+                        const newFilters = [...filters];
+                        setFilters(newFilters);
+                      }}
+                    >
+                      {['OR', 'AND'].map((v) => (
+                        <Select.Option key={v}>{v}</Select.Option>
+                      ))}
+                    </Select>
+                  </Col>
+                )}
                 <Col span={2}>
                   <Button
                     danger
-                    icon={<MinusOutlined/>}
+                    icon={<MinusOutlined />}
                     onClick={(e) => {
                       e.stopPropagation();
                       const newFilters = [...filters];
                       newFilters.splice(i, 1);
                       setFilters(newFilters);
-                    }}/>
+                    }}
+                  />
                 </Col>
               </Row>
             );
           })}
-          <Button onClick={onAddFilter}>Add <PlusOutlined/></Button>
+          <Button onClick={onAddFilter}>
+            Add <PlusOutlined />
+          </Button>
         </Col>
       </Modal>
     </>
-
   );
-})
+});

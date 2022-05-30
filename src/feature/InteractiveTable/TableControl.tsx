@@ -133,25 +133,25 @@ export const TableControls = React.memo(function TableControls(props: TableContr
   return (
     <div className="controls">
       <Button type="text" onClick={onFirstPage}>
-        <VerticalRightOutlined/>
+        <VerticalRightOutlined />
       </Button>
       <Button type="text" className="p-0" onClick={onPrevPage}>
-        <LeftOutlined/>
+        <LeftOutlined />
       </Button>
       <div style={{ paddingLeft: 10 }}>
         <Dropdown overlay={paginationMenu} trigger={['click']}>
           <Button style={{ minWidth: 100 }}>
-            <PaginationRangeText/>
-            <DownOutlined/>
+            <PaginationRangeText />
+            <DownOutlined />
           </Button>
         </Dropdown>
       </div>
       &nbsp;&nbsp;of {total} &nbsp;&nbsp;
       <Button type="text" className="p-0" onClick={onNextPage}>
-        <RightOutlined/>
+        <RightOutlined />
       </Button>
       <Button type="text" onClick={onLastPage}>
-        <VerticalLeftOutlined/>
+        <VerticalLeftOutlined />
       </Button>
       <ColumnFilter
         columnKeys={columnKeys}
@@ -163,14 +163,13 @@ export const TableControls = React.memo(function TableControls(props: TableContr
           console.log(filters);
         }}
       />
-
       <div className="buttons-container">
         {/* Dropdown button to choose excel or csv */}
         <Dropdown overlay={exportButtonMenu} trigger={['click']}>
           <Button loading={loadingExportData} type={'primary'}>
             <Space>
               Export as
-              <DownOutlined/>
+              <DownOutlined />
             </Space>
           </Button>
         </Dropdown>

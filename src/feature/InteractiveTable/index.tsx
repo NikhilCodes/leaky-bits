@@ -14,12 +14,12 @@ import { getColumnSummary } from '../../api/public/query.api';
 import { SorterResult } from 'antd/es/table/interface';
 import { paginationConfig, TableControls } from './TableControl';
 
-export interface dataSourceData {
+export interface DataSourceData {
   [key: string]: unknown;
 }
 
 export class TabledataSource {
-  data: readonly dataSourceData[];
+  data: readonly DataSourceData[];
 
   primaryKey: string;
 
@@ -57,7 +57,6 @@ export default function InteractiveTable(props: InteractiveTableProps) {
   const { onPaginate, dataSource, exportDataGetter, loading } = props;
 
   useEffect(() => {
-    // TODO: Try debounce for throtting
     onPaginate({ page, pageSize });
   }, [page, pageSize, onPaginate]);
 
@@ -211,7 +210,7 @@ const SummaryDrawer = React.memo(function SummaryDrawer(props: SummaryDrawerProp
               <Typography.Title level={4}>Artifacts</Typography.Title>
               {artifacts.map((artifact) => (
                 <div key={artifact.title}>
-                  <Typography.Title  level={5}>{artifact.title}</Typography.Title>
+                  <Typography.Title level={5}>{artifact.title}</Typography.Title>
                   <XYPlot xType="ordinal" width={460} height={300} stackBy="y">
                     <VerticalGridLines />
                     <HorizontalGridLines />

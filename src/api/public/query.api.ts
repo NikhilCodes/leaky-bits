@@ -1,6 +1,11 @@
 import { get } from './utils';
 import { TabledataSource } from '../../feature/InteractiveTable';
 
+/**
+ * Get mock data for query
+ * @param {{query: string, page?: number, pageSize?: number, sorter?}} params
+ * @returns {Promise<TabledataSource>}
+ */
 export const getResponseForQuery = async (params: {
   query: string;
   page?: number;
@@ -60,6 +65,12 @@ export const getResponseForQuery = async (params: {
   };
 };
 
+/**
+ * Get mock summary for a column inside a table
+ * @param {string} _tableName
+ * @param {string} _columnKey
+ * @returns {Promise<{min: number, avg: number, median: number, max: number, count: number, distinct: number, sum: number, artifacts: {data: ({x: string, y: number} | {x: string, y: number} | {x: string, y: number} | {x: string, y: number} | {x: string, y: number})[], title: string, type: string}[]}>}
+ */
 export const getColumnSummary = async (_tableName: string, _columnKey: string) => {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   return {

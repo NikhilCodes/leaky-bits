@@ -23,7 +23,7 @@ export default function DataViewer() {
   );
 
   return (
-    <Suspense fallback={<Spin/>}>
+    <Suspense fallback={<Spin />}>
       <InteractiveTable
         dataSource={query.dataSource}
         onPaginate={onTablePaginate}
